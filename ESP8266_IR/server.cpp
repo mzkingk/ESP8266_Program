@@ -3,12 +3,36 @@
 #include "server.h"
 #include "global.h"
 
-// 查热点列表
-void handleGetAll()
+// 启动WebServer
+void initWebServer()
 {
-    server.send(200, "text/plane", wiFiScan());
+    server.on("/", HTTP_GET, handleIndexPage); //设置主页回调函数
+    server.on("/wifi", HTTP_GET, handleWifiPage);
+    server.on("/ir", HTTP_GET, handleIRPage);
 
-    Serial.println(F("successfully return a array"));
+    server.onNotFound(handleIndexPage); //设置无法响应的http请求的回调函数
+
+    server.on("/wifi", HTTP_POST, handleWifiPost); //设置Post请求回调函数
+    server.on("/all", HTTP_GET, handleGetAll);     //查询所有wifi
+
+    server.begin(); //启动WebServer
+
+    Serial.println("WebServer started!");
+    if (dnsServer.start(DNS_PORT, "*", apIP))
+    {
+        //判断将所有地址映射到esp8266的ip上是否成功
+        Serial.println("start dns server success.");
+    }
+    else
+    {
+        Serial.println("start dns server failed.");
+    }
+}
+
+// 主页面
+void handleIndexPage()
+{
+    server.send(200, "text/html", index_html);
 }
 
 // wifi页面
@@ -17,23 +41,18 @@ void handleWifiPage()
     server.send(200, "text/html", wifi_html);
 }
 
-// 启动WebServer
-void initWebServer()
+// 空调页
+void handleIRPage()
 {
-    server.on("/", HTTP_GET, handleWifiPage);  //设置主页回调函数
-    server.onNotFound(handleWifiPage);         //设置无法响应的http请求的回调函数
-    server.on("/", HTTP_POST, handleWifiPost); //设置Post请求回调函数
-    server.on("/all", HTTP_GET, handleGetAll); //查询所有wifi
-    server.begin();                            //启动WebServer
-    Serial.println("WebServer started!");
-    if (dnsServer.start(DNS_PORT, "*", apIP))
-    { //判断将所有地址映射到esp8266的ip上是否成功
-        Serial.println("start dns server success.");
-    }
-    else
-    {
-        Serial.println("start dns server failed.");
-    }
+    server.send(200, "text/html", ir_html);
+}
+
+// 查热点列表
+void handleGetAll()
+{
+    server.send(200, "text/plane", wiFiScan());
+
+    Serial.println(F("successfully return a array"));
 }
 
 // wifi页提交
