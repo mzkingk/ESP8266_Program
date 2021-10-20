@@ -6,6 +6,8 @@
 // 启动WebServer
 void initWebServer()
 {
+    Serial.println("enter init web!");
+
     server.on("/", HTTP_GET, handleIndexPage); //设置主页回调函数
     server.on("/wifi", HTTP_GET, handleWifiPage);
     server.on("/ir", HTTP_GET, handleIRPage);
@@ -32,24 +34,28 @@ void initWebServer()
 // 主页面
 void handleIndexPage()
 {
+    Serial.println("successfully enter handle!");
     server.send(200, "text/html", index_html);
 }
 
 // wifi页面
 void handleWifiPage()
 {
+    Serial.println("successfully enter handle!");
     server.send(200, "text/html", wifi_html);
 }
 
 // 空调页
 void handleIRPage()
 {
+    Serial.println("successfully enter handle!");
     server.send(200, "text/html", ir_html);
 }
 
 // 查热点列表
 void handleGetAll()
 {
+    Serial.println("successfully enter handle!");
     server.send(200, "text/plane", wiFiScan());
 
     Serial.println(F("successfully return a array"));
@@ -58,7 +64,7 @@ void handleGetAll()
 // wifi页提交
 void handleWifiPost()
 {
-    Serial.println("start to save wifi config");
+    Serial.println("successfully enter handle!");
     if (server.hasArg("ssid2"))
     {
         strcpy(sta_ssid, server.arg("ssid2").c_str());
