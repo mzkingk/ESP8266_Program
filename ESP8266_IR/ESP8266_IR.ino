@@ -23,31 +23,13 @@ unsigned int localPort = 8888; // 用于侦听UDP数据包的本地端口
 
 boolean isNTPConnected = false;
 
-typedef struct
-{           //存储配置结构体
-    int tz; //时间戳
-} config_type;
-config_type config;
-
 void saveConfig() { //存储配置到"EEPROM"
     Serial.println("save config");
-    EEPROM.begin(sizeof(config));
-    uint8_t* p = (uint8_t*) (&config);
-    for (uint i = 0; i < sizeof(config); i++)
-    {
-        EEPROM.write(i, *(p + i));
-    }
-    EEPROM.commit(); //此操作会消耗flash写入次数
+    delay(1000);
 }
 
 void loadConfig() { //从"EEPROM"加载配置
     Serial.println("load config");
-    EEPROM.begin(sizeof(config));
-    uint8_t* p = (uint8_t*) (&config);
-    for (uint i = 0; i < sizeof(config); i++)
-    {
-        *(p + i) = EEPROM.read(i);
-    }
     delay(2000);
 }
 
@@ -60,19 +42,15 @@ const byte DNS_PORT = 53;       // DNS端口号默认为53
 IPAddress apIP(192, 168, 4, 1); // 8266 APIP
 IPAddress subnet(255, 255, 255, 0);
 
-DNSServer dnsServer;
-ESP8266WebServer server(80);
-
 void connectWiFi();
 void printDebugInfo();
-void handleGetAll();
 void initWebServer();
 
 void handleRoot() {
     server.send(200, "text/html", wifi_html);
 }
-void handleRootPost() {
-    Serial.println("handleRootPost");
+void handleWifiPost() {
+    Serial.println("start to save wifi config");
     if (server.hasArg("ssid2")) {
         strcpy(sta_ssid, server.arg("ssid2").c_str());
     } else if (server.hasArg("ssid")) {
@@ -99,23 +77,17 @@ void handleRootPost() {
     connectWiFi();
 }
 
-void handleGetAll() {
-    server.send(200, "text/plane", wiFiScan());
-
-    Serial.println(F("successfully return a array"));
-}
-
 void initWebServer() {
     server.on("/", HTTP_GET, handleRoot);      //设置主页回调函数
     server.onNotFound(handleRoot);             //设置无法响应的http请求的回调函数
-    server.on("/", HTTP_POST, handleRootPost); //设置Post请求回调函数
+    server.on("/", HTTP_POST, handleWifiPost); //设置Post请求回调函数
     server.on("/all", HTTP_GET, handleGetAll);    //查询所有wifi
     server.begin();                            //启动WebServer
     Serial.println("WebServer started!");
     if (dnsServer.start(DNS_PORT, "*", apIP)) { //判断将所有地址映射到esp8266的ip上是否成功
-        Serial.println("start dnsserver success.");
+        Serial.println("start dns server success.");
     } else {
-        Serial.println("start dnsserver failed.");
+        Serial.println("start dns server failed.");
     }
 }
 
