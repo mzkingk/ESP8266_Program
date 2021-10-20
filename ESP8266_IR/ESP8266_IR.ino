@@ -19,125 +19,17 @@
 #include "global.h"
 
 WiFiUDP Udp;
-unsigned int localPort = 8888; // 用于侦听UDP数据包的本地端口
 
-boolean isNTPConnected = false;
-
-void saveConfig() { //存储配置到"EEPROM"
-    Serial.println("save config");
-    delay(1000);
-}
-
-void loadConfig() { //从"EEPROM"加载配置
+void loadConfig()
+{ //从"EEPROM"加载配置
     Serial.println("load config");
     delay(2000);
 }
 
-char sta_ssid[32] = { 0 };        //暂存WiFi名
-char sta_password[64] = { 0 };    //暂存WiFi密码
-const char* AP_NAME = "mzking"; //自定义8266AP热点名
-const char* AP_PWD = "978964112"; //自定义热点密码，避免其他人也能连接该wifi
-
-const byte DNS_PORT = 53;       // DNS端口号默认为53
-IPAddress apIP(192, 168, 4, 1); // 8266 APIP
-IPAddress subnet(255, 255, 255, 0);
-
-void connectWiFi();
 void printDebugInfo();
-void initWebServer();
 
-
-void handleWifiPost() {
-    Serial.println("start to save wifi config");
-    if (server.hasArg("ssid2")) {
-        strcpy(sta_ssid, server.arg("ssid2").c_str());
-    } else if (server.hasArg("ssid")) {
-        strcpy(sta_ssid, server.arg("ssid").c_str());
-    } else {
-        Serial.println("[WebServer]Error, SSID not found!");
-        server.send(200, "text/html", "<meta charset='UTF-8'>Error, SSID not found!"); //返回错误页面
-        return;
-    }
-    Serial.printf(PSTR("ssid: %s\n"), sta_ssid);
-
-    if (server.hasArg("password")) {
-        strcpy(sta_password, server.arg("password").c_str());
-        Serial.printf(PSTR("sta_password: %s\n"), sta_password);
-    } else {
-        Serial.println("[WebServer]Error, PASSWORD not found!");
-        server.send(200, "text/html", "<meta charset='UTF-8'>Error, PASSWORD not found!");
-        return;
-    }
-    server.send(200, "text/html", "<meta charset='UTF-8'>提交成功"); //返回保存成功页面
-    delay(2000);
-    //一切设定完成，连接wifi
-    saveConfig();
-    connectWiFi();
-}
-
-void initWebServer() {
-    server.on("/", HTTP_GET, handleWifiPage);      //设置主页回调函数
-    server.onNotFound(handleWifiPage);             //设置无法响应的http请求的回调函数
-    server.on("/", HTTP_POST, handleWifiPost); //设置Post请求回调函数
-    server.on("/all", HTTP_GET, handleGetAll);    //查询所有wifi
-    server.begin();                            //启动WebServer
-    Serial.println("WebServer started!");
-    if (dnsServer.start(DNS_PORT, "*", apIP)) { //判断将所有地址映射到esp8266的ip上是否成功
-        Serial.println("start dns server success.");
-    } else {
-        Serial.println("start dns server failed.");
-    }
-}
-
-void connectWiFi() {
-    WiFi.mode(WIFI_STA);       //切换为STA模式
-    WiFi.setAutoConnect(true); //设置自动连接
-    WiFi.begin(sta_ssid, sta_password);
-    Serial.println("Connect WiFi");
-    int count = 0;
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        count++;
-        if (count > 20) { // 10秒过去依然没有自动连上，开启Web配网功能，可视情况调整等待时长
-            Serial.println("Timeout! AutoConnect failed");
-            WiFi.mode(WIFI_AP); //开热点
-            WiFi.softAPConfig(apIP, apIP, subnet);
-            if (WiFi.softAP(AP_NAME, AP_PWD, 7)) {
-                Serial.println("ESP8266 SoftAP is on");
-            }
-            initWebServer();// 启动WebServer
-
-            Serial.println("Please connect the WiFi named mzking, the configuration page will pop up automatically, if not, use your browser to access 192.168.4.1");
-            break; // 启动WebServer后便跳出while循环，回到loop
-        }
-        Serial.print(".");
-        if (WiFi.status() == WL_CONNECT_FAILED) {
-            Serial.print("password:");
-            Serial.print(WiFi.psk().c_str());
-            Serial.println(" is incorrect");
-        }
-        if (WiFi.status() == WL_NO_SSID_AVAIL) {
-            Serial.print("configured SSID:");
-            Serial.print(WiFi.SSID().c_str());
-            Serial.println(" cannot be reached");
-        }
-    }
-    Serial.println("");
-    if (WiFi.status() == WL_CONNECTED) {
-        Serial.println("WiFi Connected!");
-        Serial.print("IP address: ");
-        Serial.println(WiFi.localIP());
-        server.stop();
-        dnsServer.stop();
-        // WiFi连接成功后，热点便不再开启，无法再次通过web配网
-        //若WiFi连接断开，ESP8266会自动尝试重新连接，直至连接成功，无需代码干预
-        //如需要更换WiFi，请在关闭原WiFi后重启ESP8266，否则上电后会自动连接原WiFi，也就无法进入配网页面
-    }
-}
-
-void setup() {
-    initWifiHtml(wifi_html);
-
+void setup()
+{
     Serial.begin(115200);
     while (!Serial)
         continue;
@@ -158,14 +50,14 @@ void setup() {
     delay(2000);
 }
 
-void loop() {
+void loop()
+{
     server.handleClient();
     dnsServer.processNextRequest();
     delay(2000);
 }
 
-
-
-void printDebugInfo() {
+void printDebugInfo()
+{
     Serial.printf(PSTR("WiFi page html is %s\n"), wifi_html);
 }

@@ -4,5 +4,6 @@
 #define _MWIFI_H__
 
 String wiFiScan();
+void connectWiFi();
 
 #endif

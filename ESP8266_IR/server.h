@@ -4,5 +4,8 @@
 
 void handleGetAll();
 void handleWifiPage();
+void initWebServer();
+void handleWifiPost();
+void saveConfig();
 
 #endif

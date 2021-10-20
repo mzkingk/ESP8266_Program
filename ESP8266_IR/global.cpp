@@ -7,3 +7,15 @@
 
 DNSServer dnsServer;
 ESP8266WebServer server(80);
+
+byte DNS_PORT = 53; // DNS端口号默认为53
+
+IPAddress apIP(192, 168, 4, 1); // 8266 APIP
+IPAddress subnet(255, 255, 255, 0);
+
+char sta_ssid[32] = {0};     //暂存WiFi名
+char sta_password[64] = {0}; //暂存WiFi密码
+char *AP_NAME = "mzking";    //自定义8266AP热点名
+char *AP_PWD = "978964112";  //自定义热点密码，避免其他人也能连接该wifi
+
+int localPort = 8888; // 用于侦听UDP数据包的本地端口
