@@ -46,9 +46,7 @@ void connectWiFi();
 void printDebugInfo();
 void initWebServer();
 
-void handleRoot() {
-    server.send(200, "text/html", wifi_html);
-}
+
 void handleWifiPost() {
     Serial.println("start to save wifi config");
     if (server.hasArg("ssid2")) {
@@ -78,8 +76,8 @@ void handleWifiPost() {
 }
 
 void initWebServer() {
-    server.on("/", HTTP_GET, handleRoot);      //设置主页回调函数
-    server.onNotFound(handleRoot);             //设置无法响应的http请求的回调函数
+    server.on("/", HTTP_GET, handleWifiPage);      //设置主页回调函数
+    server.onNotFound(handleWifiPage);             //设置无法响应的http请求的回调函数
     server.on("/", HTTP_POST, handleWifiPost); //设置Post请求回调函数
     server.on("/all", HTTP_GET, handleGetAll);    //查询所有wifi
     server.begin();                            //启动WebServer

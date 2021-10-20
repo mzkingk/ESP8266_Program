@@ -8,3 +8,8 @@ void handleGetAll() {
 
     Serial.println(F("successfully return a array"));
 }
+
+// wifi页面
+void handleWifiPage() {
+    server.send(200, "text/html", wifi_html);
+}

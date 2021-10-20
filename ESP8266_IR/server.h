@@ -3,5 +3,6 @@
 #define _SERVER_H__
 
 void handleGetAll();
+void handleWifiPage();
 
 #endif
