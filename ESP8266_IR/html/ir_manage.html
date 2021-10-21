@@ -66,16 +66,16 @@
         </a>
     </div>
     <div class="tips">
-        关闭
+        <span id="current">关闭</span>
     </div>
     <div class="top-div">
         <div class="top-div-1">
             <div>温度+</div>
             <button class="circle top-btn-word">+</button>
         </div>
-        <div class="top-div-2">
+        <div onclick="onOff()" class="top-div-2">
             <div>开关</div>
-            <button class="circle">切换</button>
+            <button id="onOff" class="circle">切换</button>
         </div>
         <div class="top-div-3">
             <div>温度-</div>
@@ -98,6 +98,28 @@
             <button class="circle">+</button>
         </div>
     </div>
+    <script type="text/javascript">
+        var config = {
+            isOn: false,
+        };
+
+        function onOff() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    config.isOn = !config.isOn;
+                    statusChange();
+                }
+            };
+            xhttp.open('POST', '/ir/onOff', true);
+            xhttp.send();
+        }
+
+        function statusChange() {
+            var dom = document.getElementById("current");
+            dom.innerHTML = config.isOn ? "开启" : "关闭";
+        }
+    </script>
 </body>
 
 </html>

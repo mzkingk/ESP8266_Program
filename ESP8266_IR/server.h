@@ -10,6 +10,7 @@ void handleIRPage();
 
 void handleGetAll();
 void handleWifiPost();
+void handleIROnOff();
 
 void saveConfig();
 

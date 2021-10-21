@@ -30,6 +30,7 @@ void printDebugInfo();
 
 void setup()
 {
+    ac.begin(); //开启空调红外
     Serial.begin(115200);
     while (!Serial)
         continue;
@@ -54,7 +55,6 @@ void loop()
 {
     server.handleClient();
     dnsServer.processNextRequest();
-    delay(2000);
 }
 
 void printDebugInfo()

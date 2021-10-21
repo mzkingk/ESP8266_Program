@@ -3,6 +3,10 @@
 #include "server.h"
 #include "global.h"
 
+#include <IRremoteESP8266.h> //ESP8266红外控制库
+#include <IRsend.h>          //红外发送库
+#include <ir_Gree.h>         //添加格力空调的库
+
 // 启动WebServer
 void initWebServer()
 {
@@ -16,6 +20,8 @@ void initWebServer()
 
     server.on("/wifi", HTTP_POST, handleWifiPost); //设置Post请求回调函数
     server.on("/all", HTTP_GET, handleGetAll);     //查询所有wifi
+
+    server.on("/ir/onOff", HTTP_POST, handleIROnOff); // 空调开关切换
 
     server.begin(); //启动WebServer
 
@@ -34,28 +40,29 @@ void initWebServer()
 // 主页面
 void handleIndexPage()
 {
-    Serial.println("successfully enter handle!");
+    Serial.println("successfully enter handle! index");
     server.send(200, "text/html", index_html);
+    Serial.println("end handle! index");
 }
 
 // wifi页面
 void handleWifiPage()
 {
-    Serial.println("successfully enter handle!");
+    Serial.println("successfully enter handle! wifi");
     server.send(200, "text/html", wifi_html);
 }
 
 // 空调页
 void handleIRPage()
 {
-    Serial.println("successfully enter handle!");
+    Serial.println("successfully enter handle! ir");
     server.send(200, "text/html", ir_html);
 }
 
 // 查热点列表
 void handleGetAll()
 {
-    Serial.println("successfully enter handle!");
+    Serial.println("successfully enter handle! getAll");
     server.send(200, "text/plane", wiFiScan());
 
     Serial.println(F("successfully return a array"));
@@ -64,7 +71,7 @@ void handleGetAll()
 // wifi页提交
 void handleWifiPost()
 {
-    Serial.println("successfully enter handle!");
+    Serial.println("successfully enter handle! save wifi");
     if (server.hasArg("ssid2"))
     {
         strcpy(sta_ssid, server.arg("ssid2").c_str());
@@ -97,6 +104,30 @@ void handleWifiPost()
     //一切设定完成，连接wifi
     saveConfig();
     connectWiFi();
+}
+
+int onOffFlag = 0;
+void handleIROnOff()
+{
+    Serial.println("successfully enter handle! on off");
+    onOffFlag++;
+    Serial.printf("cmd is :");
+    Serial.println(onOffFlag);
+    if (onOffFlag % 2 != 0)
+    {
+        ac.on();
+        Serial.println("cmd is on");
+    }
+    else
+    {
+        ac.off();
+        Serial.println("cmd is off");
+    }
+
+    Serial.println(ac.toString()); //显示发送的空调开机红外编码
+    ac.send();                     //发送红外命令
+    server.send(200, "text/plane", "1");
+    Serial.println("cmd is end");
 }
 
 void saveConfig()

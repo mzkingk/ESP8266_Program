@@ -2,6 +2,7 @@
 
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
+#include <ir_Gree.h> //添加格力空调的库
 
 #include "global.h"
 
@@ -19,3 +20,6 @@ char *AP_NAME = "mzking";    //自定义8266AP热点名
 char *AP_PWD = "978964112";  //自定义热点密码，避免其他人也能连接该wifi
 
 int localPort = 8888; // 用于侦听UDP数据包的本地端口
+
+uint16_t kIrLed = 14; // GPIO14
+IRGreeAC ac(kIrLed);  //建立一个格力空调的控制实例
