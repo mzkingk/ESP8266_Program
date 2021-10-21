@@ -109,3 +109,40 @@ void connectWiFi()
         //如需要更换WiFi，请在关闭原WiFi后重启ESP8266，否则上电后会自动连接原WiFi，也就无法进入配网页面
     }
 }
+
+// wifi页提交
+void handleWifiPost()
+{
+    Serial.println("successfully enter handle! save wifi");
+    if (server.hasArg("ssid2"))
+    {
+        strcpy(sta_ssid, server.arg("ssid2").c_str());
+    }
+    else if (server.hasArg("ssid"))
+    {
+        strcpy(sta_ssid, server.arg("ssid").c_str());
+    }
+    else
+    {
+        Serial.println("[WebServer]Error, SSID not found!");
+        server.send(200, "text/html", "<meta charset='UTF-8'>Error, SSID not found!"); //返回错误页面
+        return;
+    }
+    Serial.printf(PSTR("ssid: %s\n"), sta_ssid);
+
+    if (server.hasArg("password"))
+    {
+        strcpy(sta_password, server.arg("password").c_str());
+        Serial.printf(PSTR("sta_password: %s\n"), sta_password);
+    }
+    else
+    {
+        Serial.println("[WebServer]Error, PASSWORD not found!");
+        server.send(200, "text/html", "<meta charset='UTF-8'>Error, PASSWORD not found!");
+        return;
+    }
+    server.send(200, "text/html", "<meta charset='UTF-8'>提交成功"); //返回保存成功页面
+    delay(2000);
+    //一切设定完成，连接wifi
+    connectWiFi();
+}

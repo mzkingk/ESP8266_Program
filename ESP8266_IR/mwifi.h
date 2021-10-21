@@ -5,5 +5,6 @@
 
 String wiFiScan();
 void connectWiFi();
+void handleWifiPost();
 
 #endif

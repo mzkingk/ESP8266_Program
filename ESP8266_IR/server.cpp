@@ -18,6 +18,7 @@ void initWebServer()
     server.on("/all", HTTP_GET, handleGetAll);     //查询所有wifi
 
     server.on("/ir/onOff", HTTP_POST, handleIROnOff); // 空调开关切换
+    server.on("/ir/temperature", HTTP_POST, handleTemperature);
 
     server.begin(); //启动WebServer
 
@@ -62,48 +63,4 @@ void handleGetAll()
     server.send(200, "text/plane", wiFiScan());
 
     Serial.println(F("successfully return a array"));
-}
-
-// wifi页提交
-void handleWifiPost()
-{
-    Serial.println("successfully enter handle! save wifi");
-    if (server.hasArg("ssid2"))
-    {
-        strcpy(sta_ssid, server.arg("ssid2").c_str());
-    }
-    else if (server.hasArg("ssid"))
-    {
-        strcpy(sta_ssid, server.arg("ssid").c_str());
-    }
-    else
-    {
-        Serial.println("[WebServer]Error, SSID not found!");
-        server.send(200, "text/html", "<meta charset='UTF-8'>Error, SSID not found!"); //返回错误页面
-        return;
-    }
-    Serial.printf(PSTR("ssid: %s\n"), sta_ssid);
-
-    if (server.hasArg("password"))
-    {
-        strcpy(sta_password, server.arg("password").c_str());
-        Serial.printf(PSTR("sta_password: %s\n"), sta_password);
-    }
-    else
-    {
-        Serial.println("[WebServer]Error, PASSWORD not found!");
-        server.send(200, "text/html", "<meta charset='UTF-8'>Error, PASSWORD not found!");
-        return;
-    }
-    server.send(200, "text/html", "<meta charset='UTF-8'>提交成功"); //返回保存成功页面
-    delay(2000);
-    //一切设定完成，连接wifi
-    saveConfig();
-    connectWiFi();
-}
-
-void saveConfig()
-{ //存储配置到"EEPROM"
-    Serial.println("save config");
-    delay(1000);
 }

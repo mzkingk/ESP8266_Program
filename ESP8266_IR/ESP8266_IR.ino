@@ -48,6 +48,9 @@ void loop()
 {
     server.handleClient();
     dnsServer.processNextRequest();
+
+    // bemfa模块使用
+    doTCPClientTick();
 }
 
 void printDebugInfo()

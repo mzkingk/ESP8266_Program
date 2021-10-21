@@ -66,10 +66,11 @@
         </a>
     </div>
     <div class="tips">
-        <span id="current">关闭</span>
+        <span id="temperature"></span>
+        <h3 id="current">关闭</h3>
     </div>
     <div class="top-div">
-        <div class="top-div-1">
+        <div onclick="temperatureAdd()" class="top-div-1">
             <div>温度+</div>
             <button class="circle top-btn-word">+</button>
         </div>
@@ -77,7 +78,7 @@
             <div>开关</div>
             <button id="onOff" class="circle">切换</button>
         </div>
-        <div class="top-div-3">
+        <div onclick="temperatureReduce()" class="top-div-3">
             <div>温度-</div>
             <button class="circle top-btn-word">-</button>
         </div>
@@ -100,24 +101,56 @@
     </div>
     <script type="text/javascript">
         var config = {
-            isOn: false,
+            isOn: {
+                value: false,
+                url: '/ir/onOff',
+                callback: () => {
+                    config.isOn.value = !config.isOn.value;
+                }
+            },
+            temperature: {
+                value: 26,
+                url: '/ir/temperature',
+                callback: () => {
+                    config.isOn.value = !config.isOn.value;
+                }
+            },
         };
 
         function onOff() {
+            handler(config.isOn.url, config.isOn.callback);
+        }
+        function temperatureAdd() {
+            handler(config.temperature.url + "?value=1", () => {
+                config.temperature.value++;
+            });
+        }
+        function temperatureReduce() {
+            handler(config.temperature.url + "?value=0", () => {
+                config.temperature.value--;
+            });
+        }
+
+        function handler(url, callback) {
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
-                    config.isOn = !config.isOn;
+                    callback();
                     statusChange();
                 }
             };
-            xhttp.open('POST', '/ir/onOff', true);
+            xhttp.open('POST', url, true);
             xhttp.send();
         }
 
         function statusChange() {
-            var dom = document.getElementById("current");
-            dom.innerHTML = config.isOn ? "开启" : "关闭";
+            document.getElementById("current").innerHTML = config.isOn.value ? "开启" : "关闭";
+
+            if (config.isOn.value) {
+                document.getElementById("temperature").innerHTML = config.temperature.value;
+            } else {
+                document.getElementById("temperature").innerHTML = '';
+            }
         }
     </script>
 </body>

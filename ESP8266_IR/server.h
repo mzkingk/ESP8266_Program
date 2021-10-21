@@ -10,8 +10,5 @@ void handleWifiPage();
 void handleIRPage();
 
 void handleGetAll();
-void handleWifiPost();
-
-void saveConfig();
 
 #endif
