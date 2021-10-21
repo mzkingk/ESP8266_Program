@@ -10,6 +10,7 @@
 #include "html.h"
 #include "mwifi.h"
 #include "server.h"
+#include "irServer.h"
 
 extern DNSServer dnsServer;
 extern ESP8266WebServer server;

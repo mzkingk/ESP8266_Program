@@ -12,13 +12,10 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
-#include <WiFiUdp.h>
 #include <SPI.h>
 #include <EEPROM.h>
 
 #include "global.h"
-
-WiFiUDP Udp;
 
 void loadConfig()
 { //从"EEPROM"加载配置
@@ -41,10 +38,6 @@ void setup()
 
     WiFi.hostname("Smart-ESP8266");
     connectWiFi();
-
-    Serial.println("Starting UDP");
-    Udp.begin(localPort);
-    Serial.printf(PSTR("Local port: %d\n"), Udp.localPort());
 
     printDebugInfo();
 
