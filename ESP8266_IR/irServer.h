@@ -5,6 +5,7 @@
 
 void handleTemperature();
 void handleIROnOff();
+void handleModeChange();
 
 void handleSend();
 

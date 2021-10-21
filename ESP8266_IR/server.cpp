@@ -19,6 +19,7 @@ void initWebServer()
 
     server.on("/ir/onOff", HTTP_POST, handleIROnOff); // 空调开关切换
     server.on("/ir/temperature", HTTP_POST, handleTemperature);
+    server.on("/ir/mode", HTTP_POST, handleModeChange);
 
     server.begin(); //启动WebServer
 

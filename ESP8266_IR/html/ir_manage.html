@@ -62,11 +62,14 @@
 <body>
     <div class="main">
         <a href="/">
-            <h1>空调配置页</h1>
+            <h1>空调配置</h1>
         </a>
     </div>
-    <div class="tips" style="height: 40px;">
+    <div class="tips" style="height: 30px;">
         <h5 id="temperature"></h5>
+    </div>
+    <div class="tips" style="height: 30px;">
+        <h5 id="modeText"></h5>
     </div>
     <div class="tips" style="height: 100px;">
         <h3 id="status">关闭</h3>
@@ -86,58 +89,79 @@
         </div>
     </div>
     <div class="top-div center bottom-div" style="background: lavenderblush;">
-        <div class="top-div-1 center" style="width: 40%;">
-            <button class="circle">+</button>
+        <div onclick="modeChange()" class="top-div-1 center" style="width: 40%;">
+            <button class="circle">模式</button>
         </div>
         <div class="top-div-1 center" style="width: 40%;">
-            <button class="circle">+</button>
+            <button class="circle">风速</button>
         </div>
     </div>
     <div class="top-div center bottom-div" style="background: lavenderblush;">
         <div class="top-div-1 center" style="width: 40%;">
-            <button class="circle">+</button>
+            <button class="circle">上下</button>
         </div>
         <div class="top-div-1 center" style="width: 40%;">
-            <button class="circle">+</button>
+            <button class="circle">左右</button>
         </div>
     </div>
     <script type="text/javascript">
         var config = {
-            isOn: {
+            status: {
                 value: false,
                 url: '/ir/onOff',
                 callback: () => {
-                    config.isOn.value = !config.isOn.value;
+
                 }
             },
             temperature: {
                 value: 26,
                 url: '/ir/temperature',
                 callback: () => {
-                    config.isOn.value = !config.isOn.value;
+
+                }
+            },
+            mode: {
+                value: '',
+                text: '',
+                url: '/ir/mode',
+                callback: () => {
+
                 }
             },
         };
+        var modeText = ['kGreeAuto', 'kGreeCool', 'kGreeDry', 'kGreeFan', 'kGreeHeat'];
 
         function onOff() {
-            handler(config.isOn.url, config.isOn.callback);
+            handler(config.status.url, config.status.callback);
         }
         function temperatureAdd() {
-            handler(config.temperature.url + "?value=1", () => {
-                config.temperature.value++;
-            });
+            handler(config.temperature.url + "?value=1");
         }
         function temperatureReduce() {
-            handler(config.temperature.url + "?value=0", () => {
-                config.temperature.value--;
-            });
+            handler(config.temperature.url + "?value=0");
+        }
+        function modeChange() {
+            handler(config.mode.url);
         }
 
         function handler(url, callback) {
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
-                    callback();
+                    var text = this.responseText;
+                    try {
+                        var obj = JSON.parse(text);
+                        config.status.value = obj.status;
+                        config.temperature.value = obj.temperature;
+                        config.mode.value = obj.mode;
+                        config.mode.text = modeText[obj.mode];
+                    } catch (error) {
+                        alert(text);
+                    }
+
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
                     statusChange();
                 }
             };
@@ -146,10 +170,11 @@
         }
         statusChange();
         function statusChange() {
-            document.getElementById("status").innerHTML = config.isOn.value ? "开启" : "关闭";
+            document.getElementById("status").innerHTML = config.status.value ? "开启" : "关闭";
 
-            if (config.isOn.value) {
+            if (config.status.value) {
                 document.getElementById("temperature").innerHTML = config.temperature.value + ' ℃';
+                document.getElementById("modeText").innerHTML = modeText[config.mode.value];;
             } else {
                 document.getElementById("temperature").innerHTML = '';
             }

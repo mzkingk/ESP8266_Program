@@ -9,23 +9,14 @@
 
 int onOffFlag = 0;
 int temperature = 26;
+int mode = 0;
 
 void handleIROnOff()
 {
     Serial.println("successfully enter handle! on off");
     onOffFlag++;
-    Serial.printf("cmd is :");
-    Serial.println(onOffFlag);
-    if (onOffFlag % 2 != 0)
-    {
-        ac.on();
-        Serial.println("cmd is on");
-    }
-    else
-    {
-        ac.off();
-        Serial.println("cmd is off");
-    }
+    Serial.printf(PSTR("flag is :%s\n"), onOffFlag % 2 != 0 ? "on" : "off");
+    onOffFlag % 2 != 0 ? ac.on() : ac.off();
 
     handleSend();
 }
@@ -34,24 +25,47 @@ void handleTemperature()
 {
     Serial.println("enter handle! temperature");
     String arg = server.arg(0);
-    if (arg == String('1'))
-    {
-        temperature++;
-    }
-    else
-    {
-        temperature--;
-    }
+
+    arg == String('1') ? temperature++ : temperature--;
+    temperature = temperature < 16 ? 16 : temperature;
+    temperature = temperature > 30 ? 30 : temperature;
+
     Serial.printf(PSTR("temperature is :%d, value is:%s\n"), temperature, arg);
     ac.setTemp(temperature);
+    handleSend();
+}
+
+// kGreeAuto, kGreeDry, kGreeCool, kGreeFan, kGreeHeat
+void handleModeChange()
+{
+    Serial.println("enter handle! mode change");
+    mode++;
+    mode = mode >= 5 ? 0 : mode;
+    ac.setMode(mode);
+
+    Serial.printf(PSTR("set mode end, mode is :%d\n"), mode);
 
     handleSend();
 }
 
 void handleSend()
 {
-    Serial.println(ac.toString()); //显示发送的空调开机红外编码
-    ac.send();                     //发送红外命令
-    server.send(200, "text/plane", "1");
+    Serial.println(ac.toString()); // 显示发送的空调开机红外编码
+    ac.send();                     // 发送红外命令
+
+    String json = "";
+    json += "{";
+    json += "\"status\":\"" + String(onOffFlag % 2 == 0) + "\"";
+    json += ",";
+    json += "\"temperature\":\"" + String(temperature) + "\"";
+    json += ",";
+    json += "\"mode\":\"" + String(mode) + "\"";
+    json += "}";
+    server.send(200, "text/plane", json);
+
+    Serial.printf("json is: ");
+    Serial.println(json);
+    json = "";
+
     Serial.println("cmd is end");
 }
