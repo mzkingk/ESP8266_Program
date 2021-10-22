@@ -151,7 +151,7 @@
                     var text = this.responseText;
                     try {
                         var obj = JSON.parse(text);
-                        config.status.value = obj.status;
+                        config.status.value = obj.status === '1';
                         config.temperature.value = obj.temperature;
                         config.mode.value = obj.mode;
                         config.mode.text = modeText[obj.mode];
