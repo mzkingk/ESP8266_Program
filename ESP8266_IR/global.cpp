@@ -25,5 +25,5 @@ uint16_t kIrLed = 14; // GPIO14
 IRGreeAC ac(kIrLed);  //建立一个格力空调的控制实例
 
 //********************需要修改的部分*******************//
-String UID = "815bb03a60d5e4bc3373a57bfbf0e891"; //用户私钥，可在控制台获取,修改为自己的UID
+String UID = "fds5f5sdf3ds4f3sd4f3ds3fsdf4sd3"; //用户私钥，可在控制台获取,修改为自己的UID
 String TOPIC = "ESP8266IR005";                   //主题名字，可在控制台新建

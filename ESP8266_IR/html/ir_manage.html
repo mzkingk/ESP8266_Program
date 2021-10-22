@@ -75,7 +75,7 @@
         <h3 id="status">关闭</h3>
     </div>
     <div class="top-div">
-        <div onclick="temperatureAdd()" class="top-div-1">
+        <div onclick="temperature(1)" class="top-div-1">
             <div>温度+</div>
             <button class="circle top-btn-word">+</button>
         </div>
@@ -83,7 +83,7 @@
             <div>开关</div>
             <button id="onOff" class="circle">切换</button>
         </div>
-        <div onclick="temperatureReduce()" class="top-div-3">
+        <div onclick="temperature(0)" class="top-div-3">
             <div>温度-</div>
             <button class="circle top-btn-word">-</button>
         </div>
@@ -108,42 +108,30 @@
         var config = {
             status: {
                 value: false,
-                url: '/ir/onOff',
-                callback: () => {
-
-                }
+                url: '/ir/onOff'
             },
             temperature: {
                 value: 26,
                 url: '/ir/temperature',
-                callback: () => {
-
-                }
             },
             mode: {
                 value: '',
                 text: '',
                 url: '/ir/mode',
-                callback: () => {
-
-                }
             },
         };
-        var modeText = ['kGreeAuto', 'kGreeCool', 'kGreeDry', 'kGreeFan', 'kGreeHeat'];
+        var modeText = ['自动', '冷风', '干燥', '换气', '暖风'];
 
         function onOff() {
-            handler(config.status.url, config.status.callback);
+            handler(config.status.url);
         }
-        function temperatureAdd() {
-            handler(config.temperature.url + "?value=1");
-        }
-        function temperatureReduce() {
-            handler(config.temperature.url + "?value=0");
+        function temperature(v) {
+            handler(config.temperature.url + "?value=" + parseInt(v));
         }
         function modeChange() {
             handler(config.mode.url);
         }
-
+        handler("/ir/config");
         function handler(url, callback) {
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
@@ -168,7 +156,6 @@
             xhttp.open('POST', url, true);
             xhttp.send();
         }
-        statusChange();
         function statusChange() {
             document.getElementById("status").innerHTML = config.status.value ? "开启" : "关闭";
 

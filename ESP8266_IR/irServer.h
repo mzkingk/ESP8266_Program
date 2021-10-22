@@ -7,6 +7,6 @@ void handleTemperature();
 void handleIROnOff();
 void handleModeChange();
 
-void handleSend();
+void handleSendConfig();
 
 #endif

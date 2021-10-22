@@ -18,7 +18,8 @@ void handleIROnOff()
     Serial.printf(PSTR("flag is :%s\n"), onOffFlag % 2 != 0 ? "on" : "off");
     onOffFlag % 2 != 0 ? ac.on() : ac.off();
 
-    handleSend();
+    ac.send();
+    handleSendConfig();
 }
 
 void handleTemperature()
@@ -31,8 +32,10 @@ void handleTemperature()
     temperature = temperature > 30 ? 30 : temperature;
 
     Serial.printf(PSTR("temperature is :%d, value is:%s\n"), temperature, arg);
+
     ac.setTemp(temperature);
-    handleSend();
+    ac.send();
+    handleSendConfig();
 }
 
 // kGreeAuto, kGreeDry, kGreeCool, kGreeFan, kGreeHeat
@@ -41,18 +44,17 @@ void handleModeChange()
     Serial.println("enter handle! mode change");
     mode++;
     mode = mode >= 5 ? 0 : mode;
-    ac.setMode(mode);
 
     Serial.printf(PSTR("set mode end, mode is :%d\n"), mode);
 
-    handleSend();
+    ac.setMode(mode);
+    ac.send();
+    handleSendConfig();
 }
 
-void handleSend()
+void handleSendConfig()
 {
-    Serial.println(ac.toString()); // 显示发送的空调开机红外编码
-    ac.send();                     // 发送红外命令
-
+    Serial.println(ac.toString());
     String json = "";
     json += "{";
     json += "\"status\":\"" + String(onOffFlag % 2 == 0) + "\"";
