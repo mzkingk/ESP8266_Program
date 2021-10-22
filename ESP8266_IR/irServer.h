@@ -6,6 +6,11 @@
 void handleTemperature();
 void handleIROnOff();
 void handleModeChange();
+void handleFanChange();
+void swingChange();
+
+void swingAuto();
+void swingChange();
 
 void handleSendConfig();
 

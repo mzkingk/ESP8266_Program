@@ -21,6 +21,9 @@ void initWebServer()
     server.on("/ir/temperature", HTTP_POST, handleTemperature);
     server.on("/ir/mode", HTTP_POST, handleModeChange);
     server.on("/ir/config", HTTP_POST, handleSendConfig);
+    server.on("/ir/fan", HTTP_POST, handleFanChange);
+    server.on("/ir/swing-auto", HTTP_POST, swingAuto);
+    server.on("/ir/swing-change", HTTP_POST, swingChange);
 
     server.begin(); //启动WebServer
 

@@ -66,7 +66,7 @@
         </a>
     </div>
     <div class="tips" style="height: 30px;">
-        <h5 id="temperature"></h5>
+        <h5 id="text"></h5>
     </div>
     <div class="tips" style="height: 30px;">
         <h5 id="modeText"></h5>
@@ -92,16 +92,16 @@
         <div onclick="modeChange()" class="top-div-1 center" style="width: 40%;">
             <button class="circle">模式</button>
         </div>
-        <div class="top-div-1 center" style="width: 40%;">
+        <div onclick="fanChange()" class="top-div-1 center" style="width: 40%;">
             <button class="circle">风速</button>
         </div>
     </div>
     <div class="top-div center bottom-div" style="background: lavenderblush;">
-        <div class="top-div-1 center" style="width: 40%;">
-            <button class="circle">上下</button>
+        <div onclick="swingAuto()" class="top-div-1 center" style="width: 40%;">
+            <button class="circle">自动</button>
         </div>
-        <div class="top-div-1 center" style="width: 40%;">
-            <button class="circle">左右</button>
+        <div onclick="swingMode()" class="top-div-1 center" style="width: 40%;">
+            <button class="circle">扫风</button>
         </div>
     </div>
     <script type="text/javascript">
@@ -119,8 +119,27 @@
                 text: '',
                 url: '/ir/mode',
             },
+            fan: {
+                value: '',
+                text: '',
+                url: '/ir/fan',
+            },
+            swingAuto: {
+                value: '',
+                text: '',
+                url: '/ir/swing-auto',
+            },
+            swingMode: {
+                value: '',
+                text: '',
+                url: '/ir/swing-change',
+            },
         };
         var modeText = ['自动', '冷风', '干燥', '换气', '暖风'];
+        var fanText = ['自动', '低', '中', '高'];
+        var swingText = ['kGreeSwingLastPos', 'kGreeSwingAuto', 'kGreeSwingUp', 'kGreeSwingMiddleUp',
+            'kGreeSwingMiddle', 'kGreeSwingMiddleDown', 'kGreeSwingDown', 'kGreeSwingDownAuto',
+            'kGreeSwingMiddleAuto', 'kGreeSwingUpAuto'];
 
         function onOff() {
             handler(config.status.url);
@@ -130,6 +149,15 @@
         }
         function modeChange() {
             handler(config.mode.url);
+        }
+        function fanChange() {
+            handler(config.fan.url);
+        }
+        function swingAuto() {
+            handler(config.swingAuto.url);
+        }
+        function swingMode() {
+            handler(config.swingMode.url);
         }
         handler("/ir/config");
         function handler(url, callback) {
@@ -143,6 +171,14 @@
                         config.temperature.value = obj.temperature;
                         config.mode.value = obj.mode;
                         config.mode.text = modeText[obj.mode];
+                        config.fan.value = obj.fan;
+                        config.fan.text = fanText[obj.fan];
+
+                        config.swingAuto.value = obj.swingAuto;
+                        config.swingMode.value = obj.swingMode;
+
+                        config.swingAuto.text = obj.swingAuto === '1' ? '摆风开' : '摆风关';
+                        config.swingMode.text = swingText[obj.swingMode];
                     } catch (error) {
                         alert(text);
                     }
@@ -160,10 +196,14 @@
             document.getElementById("status").innerHTML = config.status.value ? "开启" : "关闭";
 
             if (config.status.value) {
-                document.getElementById("temperature").innerHTML = config.temperature.value + ' ℃';
+                var text = config.temperature.value + ' ℃;';
+                text += ` ${config.fan.text}`;
+                text += ` ${config.swingAuto.text}-${config.swingMode.text}`;
+
+                document.getElementById("text").innerHTML = text;
                 document.getElementById("modeText").innerHTML = modeText[config.mode.value];;
             } else {
-                document.getElementById("temperature").innerHTML = '';
+                document.getElementById("text").innerHTML = '';
             }
         }
     </script>
