@@ -12,6 +12,7 @@
 #include "server.h"
 #include "irServer.h"
 #include "bemfa.h"
+#include "sysConfig.h"
 
 extern DNSServer dnsServer;
 extern ESP8266WebServer server;

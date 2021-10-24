@@ -17,12 +17,6 @@
 
 #include "global.h"
 
-void loadConfig()
-{ //从"EEPROM"加载配置
-    Serial.println("load config");
-    delay(2000);
-}
-
 void printDebugInfo();
 
 void setup()
