@@ -241,14 +241,9 @@ void connectWiFi()
     Serial.println("");
     if (WiFi.status() == WL_CONNECTED)
     {
-        Serial.println("WiFi Connected!");
-        Serial.print("IP address: ");
-        Serial.println(WiFi.localIP());
-        server.stop();
-        dnsServer.stop();
-        //WiFi连接成功后，热点便不再开启，无法再次通过web配网
+        Serial.printf(PSTR("WiFi Connected!\nIP address: %s\n"), WiFi.localIP());
+        // WiFi连接成功后，热点便不再开启，如需要更换WiFi，请通过局域网ip访问web页面重新配置
         //若WiFi连接断开，ESP8266会自动尝试重新连接，直至连接成功，无需代码干预
-        //如需要更换WiFi，请在关闭原WiFi后重启ESP8266，否则上电后会自动连接原WiFi，也就无法进入配网页面
     }
 }
 
