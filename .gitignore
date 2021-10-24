@@ -1,4 +1,5 @@
 
 ESP8266_IR/html/*.min-min.html
 ESP8266_IR/html/*.min.html
-.vscode/c_cpp_properties.json
+.vscode/
+.vscode

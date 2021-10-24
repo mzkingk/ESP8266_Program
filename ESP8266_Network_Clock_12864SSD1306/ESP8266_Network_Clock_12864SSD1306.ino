@@ -19,7 +19,7 @@
  */
 /**********************************************************************
  * 使用说明：
- * 初次上电后，用任意设备连接热点WiFi：flyAkari，等待登录页弹出或浏览器输入
+ * 初次上电后，用任意设备连接热点WiFi：mzking，等待登录页弹出或浏览器输入
  * 192.168.4.1进入WiFi及时钟配置页面，输入待连接WiFi名和密码、时区(-12~12)，
  * 填全后提交。若连接成功，则开发板会记住以上配置的信息，并在下次上电时自动连接
  * WiFi并显示时间，热点和配置页面不再出现。如需更改倒数日或WiFi信息，请关闭原
@@ -36,8 +36,8 @@
 #include <U8g2lib.h>
 
 //若屏幕使用SH1106，只需把SSD1306改为SH1106即可
-//U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/4, /* dc=*/5, /* reset=*/3);
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
+U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/4, /* dc=*/5, /* reset=*/3);
+//U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 //U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE, /* clock=*/ 4, /* data=*/ 5); //D-duino
 
 static const char ntpServerName[] = "ntp1.aliyun.com"; //NTP服务器，阿里云
@@ -93,7 +93,7 @@ void loadConfig()
 
 char sta_ssid[32] = {0};          //暂存WiFi名
 char sta_password[64] = {0};      //暂存WiFi密码
-const char *AP_NAME = "flyAkari"; //自定义8266AP热点名
+const char *AP_NAME = "mzking"; //自定义8266AP热点名
 //配网及目标日期设定html页面
 const char *page_html = "\
 <!DOCTYPE html>\r\n\
@@ -114,7 +114,7 @@ const char *page_html = "\
     <input type='text' name='timezone' value='8'><br>\r\n\
     <input type='submit' value='提交'>\r\n\
     <br><br>\r\n\
-    <a href='https://space.bilibili.com/751219'>FlyAkari</a>\r\n\
+    <a href='https://space.bilibili.com/751219'>mzking</a>\r\n\
   </form>\r\n\
 </body>\r\n\
 </html>\r\n\
@@ -221,7 +221,7 @@ void connectWiFi()
             else
                 Serial.println("start dnsserver failed.");
             Serial.println("Please reset your WiFi setting.");
-            Serial.println("Connect the WiFi named flyAkari, the configuration page will pop up automatically, if not, use your browser to access 192.168.4.1");
+            Serial.println("Connect the WiFi named mzking, the configuration page will pop up automatically, if not, use your browser to access 192.168.4.1");
             break; //启动WebServer后便跳出while循环，回到loop
         }
         Serial.print(".");
@@ -258,7 +258,7 @@ void setup()
     while (!Serial)
         continue;
     Serial.println("NTP Clock oled version v1.1");
-    Serial.println("Designed by flyAkari");
+    Serial.println("Designed by mzking");
     initdisplay();
     u8g2.clearBuffer();
     u8g2.setFont(u8g2_font_unifont_t_chinese2);
@@ -267,7 +267,7 @@ void setup()
     u8g2.setCursor(0, 30);
     u8g2.print("connection...");
     u8g2.setCursor(0, 47);
-    u8g2.print("flyAkari");
+    u8g2.print("mzking");
     u8g2.setCursor(0, 64);
     u8g2.print("192.168.4.1");
     u8g2.sendBuffer();
