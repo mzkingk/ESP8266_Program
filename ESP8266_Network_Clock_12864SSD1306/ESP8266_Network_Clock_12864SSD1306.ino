@@ -36,8 +36,8 @@
 #include <U8g2lib.h>
 
 //若屏幕使用SH1106，只需把SSD1306改为SH1106即可
-U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/4, /* dc=*/5, /* reset=*/3);
-//U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
+//U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/4, /* dc=*/5, /* reset=*/3);
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 //U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE, /* clock=*/ 4, /* data=*/ 5); //D-duino
 
 static const char ntpServerName[] = "ntp1.aliyun.com"; //NTP服务器，阿里云
@@ -283,7 +283,7 @@ void setup()
     Serial.println(Udp.localPort());
     Serial.println("waiting for sync");
     setSyncProvider(getNtpTime);
-    setSyncInterval(300); //每300秒同步一次时间
+    setSyncInterval(60); //每300秒同步一次时间
 }
 
 time_t prevDisplay = 0; //当时钟已经显示
