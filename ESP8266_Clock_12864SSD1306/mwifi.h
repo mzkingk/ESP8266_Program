@@ -1,0 +1,10 @@
+#include <Arduino.h>
+
+#ifndef _MWIFI_H__
+#define _MWIFI_H__
+
+String wiFiScan();
+void connectWiFi();
+void handleWifiPost();
+
+#endif
