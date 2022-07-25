@@ -22,7 +22,7 @@ char *AP_PWD = "978964112";  //自定义热点密码，避免其他人也能连�
 int localPort = 8888; // 用于侦听UDP数据包的本地端口
 
 uint16_t kIrLed = 14; // GPIO14
-IRGreeAC ac(kIrLed);  //建立一个格力空调的控制实例
+IRGreeAC geli(kIrLed);  //建立一个格力空调的控制实例
 
 //********************需要修改的部分*******************//
 String UID = "fds5f5sdf3ds4f3sd4f3ds3fsdf4sd3"; //用户私钥，可在控制台获取,修改为自己的UID

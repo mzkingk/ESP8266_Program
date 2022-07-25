@@ -30,7 +30,7 @@ extern char *AP_PWD;          //自定义热点密码，避免其他人也能连
 extern int localPort; // 用于侦听UDP数据包的本地端口
 
 extern uint16_t kIrLed; // 红外发射模块接的数据脚
-extern IRGreeAC ac;     //建立一个格力空调的控制实例
+extern IRGreeAC geli;   //建立一个格力空调的控制实例
 
 extern String UID;   //用户私钥，可在控制台获取,修改为自己的UID
 extern String TOPIC; //主题名字，可在控制台新建
