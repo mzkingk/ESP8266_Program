@@ -1,5 +1,6 @@
 
 ESP8266_IR/html/*.min-min.html
 ESP8266_IR/html/*.min.html
-.vscode/
+.vscode/*
 .vscode
+.vscode/arduino.json
