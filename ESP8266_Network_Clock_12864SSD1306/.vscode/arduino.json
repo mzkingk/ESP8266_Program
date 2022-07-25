@@ -1,6 +1,0 @@
-{
-    "port": "COM3",
-    "board": "esp8266:esp8266:nodemcuv2",
-    "programmer": "arduino:avrisp",
-    "sketch": "ESP8266_Network_Clock_12864SSD1306.ino"
-}
