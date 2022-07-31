@@ -21,7 +21,7 @@ void printDebugInfo();
 
 void setup()
 {
-    ac.begin(); //开启空调红外
+    geli.begin(); //开启空调红外
     Serial.begin(115200);
     while (!Serial)
         continue;

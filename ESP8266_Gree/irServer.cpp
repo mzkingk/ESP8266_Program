@@ -15,12 +15,12 @@ void handleIROnOff()
 {
     Serial.println("successfully enter handle! on off");
 
-    ac.setPower(!ac.getPower());
+    geli.setPower(!geli.getPower());
 
     Serial.printf("flag is :");
-    Serial.println(ac.getPower());
+    Serial.println(geli.getPower());
 
-    ac.send();
+    geli.send();
     handleSendConfig();
 }
 
@@ -29,12 +29,12 @@ void handleTemperature()
     Serial.println("enter handle! temperature");
     String arg = server.arg(0);
 
-    const uint8_t temp = ac.getTemp() + (arg == String('1') ? 1 : -1);
+    const uint8_t temp = geli.getTemp() + (arg == String('1') ? 1 : -1);
 
     Serial.printf(PSTR("temperature is :%d, value is:%s\n"), temp, arg);
 
-    ac.setTemp(temp);
-    ac.send();
+    geli.setTemp(temp);
+    geli.send();
     handleSendConfig();
 }
 
@@ -47,8 +47,8 @@ void handleModeChange()
 
     Serial.printf(PSTR("set mode end, mode is :%d\n"), mode);
 
-    ac.setMode(mode);
-    ac.send();
+    geli.setMode(mode);
+    geli.send();
     handleSendConfig();
 }
 
@@ -58,11 +58,11 @@ void handleFanChange()
     fan++;
     fan = fan > 3 ? 0 : fan;
 
-    ac.setFan(fan);
+    geli.setFan(fan);
 
-    Serial.printf(PSTR("set fan , is :%d\n"), ac.getFan());
+    Serial.printf(PSTR("set fan , is :%d\n"), geli.getFan());
 
-    ac.send();
+    geli.send();
     handleSendConfig();
 }
 
@@ -71,15 +71,15 @@ void swingAuto()
 {
     Serial.println("enter handle! swing change");
 
-    bool automatic = !ac.getSwingVerticalAuto();
+    bool automatic = !geli.getSwingVerticalAuto();
 
-    ac.setSwingVertical(automatic, ac.getSwingVerticalPosition());
+    geli.setSwingVertical(automatic, geli.getSwingVerticalPosition());
 
     Serial.printf(PSTR("set swing , is:"));
     Serial.println(automatic);
-    Serial.println(ac.getSwingVerticalPosition());
+    Serial.println(geli.getSwingVerticalPosition());
 
-    ac.send();
+    geli.send();
     handleSendConfig();
 }
 
@@ -88,7 +88,7 @@ void swingChange()
 {
     Serial.println("enter handle! swing change");
 
-    bool automatic = ac.getSwingVerticalAuto();
+    bool automatic = geli.getSwingVerticalAuto();
     if (!automatic)
     {
         swingMode = swingMode + 1 > 4 ? 0 : swingMode + 1;
@@ -97,7 +97,7 @@ void swingChange()
                           : swingMode == 2 ? kGreeSwingMiddle
                           : swingMode == 3 ? kGreeSwingMiddleDown
                                            : kGreeSwingDown;
-        ac.setSwingVertical(automatic, m);
+        geli.setSwingVertical(automatic, m);
     }
     else
     {
@@ -106,33 +106,33 @@ void swingChange()
                           : swingMode == 1 ? kGreeSwingDownAuto
                           : swingMode == 2 ? kGreeSwingMiddleAuto
                                            : kGreeSwingUpAuto;
-        ac.setSwingVertical(automatic, m);
+        geli.setSwingVertical(automatic, m);
     }
 
     Serial.printf(PSTR("set swing , is:\n"));
     Serial.println(automatic);
-    Serial.println(ac.getSwingVerticalPosition());
+    Serial.println(geli.getSwingVerticalPosition());
 
-    ac.send();
+    geli.send();
     handleSendConfig();
 }
 
 void handleSendConfig()
 {
-    Serial.println(ac.toString());
+    Serial.println(geli.toString());
     String json = "";
     json += "{";
-    json += "\"status\":\"" + String(ac.getPower()) + "\"";
+    json += "\"status\":\"" + String(geli.getPower()) + "\"";
     json += ",";
-    json += "\"temperature\":\"" + String(ac.getTemp()) + "\"";
+    json += "\"temperature\":\"" + String(geli.getTemp()) + "\"";
     json += ",";
     json += "\"mode\":\"" + String(mode) + "\"";
     json += ",";
     json += "\"fan\":\"" + String(fan) + "\"";
     json += ",";
-    json += "\"swingAuto\":\"" + String(ac.getSwingVerticalAuto()) + "\"";
+    json += "\"swingAuto\":\"" + String(geli.getSwingVerticalAuto()) + "\"";
     json += ",";
-    json += "\"swingMode\":\"" + String(ac.getSwingVerticalPosition()) + "\"";
+    json += "\"swingMode\":\"" + String(geli.getSwingVerticalPosition()) + "\"";
     json += "}";
     server.send(200, "text/plane", json);
 
