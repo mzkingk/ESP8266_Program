@@ -18,4 +18,7 @@
 - 修改global.cpp中的配置项
 - 配置点片机，接线如下图
 
+  如下两种，都是可以的
 ![接线图1](./extension/接线图1.jpg)
+
+![](./extension/接线图d1mini.png)
