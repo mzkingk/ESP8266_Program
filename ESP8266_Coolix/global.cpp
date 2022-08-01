@@ -22,9 +22,9 @@ char sta_ssid[32] = "CMCC-3G6W";
 //默认连接的WiFi密码
 char sta_password[64] = "";
 //自定义8266AP热点名
-char *AP_NAME = "mzking";
+char *AP_NAME = "esp8266";
 //自定义热点密码，避免其他人也能连接该wifi
-char *AP_PWD = "";
+char *AP_PWD = "esp8266";
 
 // 信号指针端口，比如14代表的是GPIO14
 uint16_t kIrLed = 14;
