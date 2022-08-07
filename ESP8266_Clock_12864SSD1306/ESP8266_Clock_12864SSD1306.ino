@@ -42,18 +42,6 @@ void setup()
         continue;
     Serial.println("NTP Clock oled version v1.1");
     initdisplay();
-    u8g2.clearBuffer();
-    u8g2.setFont(u8g2_font_unifont_t_chinese2);
-    u8g2.setCursor(0, 14);
-    u8g2.print("Waiting for WiFi");
-    u8g2.setCursor(0, 30);
-    u8g2.print("connection...");
-    u8g2.setCursor(0, 47);
-    u8g2.print(AP_NAME);
-    u8g2.setCursor(0, 64);
-    u8g2.print("192.168.4.1");
-    u8g2.sendBuffer();
-    Serial.println("OLED Ready");
     Serial.print("Connecting WiFi...");
     loadConfig();
     Serial.print("Connecting WiFi...");

@@ -13,7 +13,7 @@ void oledClockDisplay();
 void sendCommand(int command, int value);
 void initdisplay();
 
-boolean isNTPConnected = false;
+int isNTPConnected = 0;
 
 unsigned char xing[] U8X8_PROGMEM = {
     0x00, 0x00, 0xF8, 0x0F, 0x08, 0x08, 0xF8, 0x0F, 0x08, 0x08, 0xF8, 0x0F, 0x80, 0x00, 0x88, 0x00,
@@ -26,6 +26,18 @@ void initdisplay()
 {
     u8g2.begin();
     u8g2.enableUTF8Print();
+    u8g2.clearBuffer();
+    u8g2.setFont(u8g2_font_unifont_t_chinese2);
+    u8g2.setCursor(0, 14);
+    u8g2.print("Waiting for WiFi");
+    u8g2.setCursor(0, 30);
+    u8g2.print("connection...");
+    u8g2.setCursor(0, 47);
+    u8g2.print(AP_NAME);
+    u8g2.setCursor(0, 64);
+    u8g2.print("192.168.4.1");
+    u8g2.sendBuffer();
+    Serial.println("OLED Ready");
 }
 
 void oledClockDisplay()
@@ -42,12 +54,14 @@ void oledClockDisplay()
     u8g2.clearBuffer();
     u8g2.setFont(u8g2_font_unifont_t_chinese2);
     u8g2.setCursor(0, 14);
-    if (isNTPConnected)
-    {
-        u8g2.print("网络OK");
-    }
+    if (isNTPConnected < 3)
+        u8g2.print("Network OK.");
     else
-        u8g2.print("网络异常!"); //如果上次对时失败，则会显示网络异常
+    {
+        isNTPConnected = 3;
+        u8g2.print("Network Error!");
+    }
+
     String currentTime = "";
     if (hours < 10)
         currentTime += 0;
@@ -108,7 +122,7 @@ time_t getNtpTime()
     IPAddress ntpServerIP; // NTP服务器的地址
 
     while (Udp.parsePacket() > 0)
-        ; // 丢弃以前接收的任何数据包
+        continue; // 丢弃以前接收的任何数据包
     Serial.println("Transmit NTP Request");
     // 从池中获取随机服务器
     WiFi.hostByName(ntpServerName, ntpServerIP);
@@ -123,7 +137,7 @@ time_t getNtpTime()
         if (size >= NTP_PACKET_SIZE)
         {
             Serial.println("Receive NTP Response");
-            isNTPConnected = true;
+            isNTPConnected = 0;
             Udp.read(packetBuffer, NTP_PACKET_SIZE); // 将数据包读取到缓冲区
             unsigned long secsSince1900;
             // 将从位置40开始的四个字节转换为长整型，只取前32位整数部分
@@ -137,7 +151,7 @@ time_t getNtpTime()
         }
     }
     Serial.println("No NTP Response :-("); //无NTP响应
-    isNTPConnected = false;
+    isNTPConnected++;
     return 0; //如果未得到时间则返回0
 }
 
