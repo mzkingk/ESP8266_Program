@@ -4,6 +4,7 @@
 #include <DNSServer.h>
 #include <WiFiUdp.h>
 #include <U8g2lib.h>
+#include <ir_Coolix.h> //添加空调的库
 
 #include "global.h"
 
@@ -33,6 +34,11 @@ char ntpServerName[] = "ntp1.aliyun.com";
 
 // 用于侦听UDP数据包的本地端口
 int localPort = 8888;
+
+// 红外发射管信号指针端口
+uint16_t kIrLed = 14;
+//建立一个空调的控制实例，不同空调这里需修改
+IRCoolixAC ac(kIrLed);
 
 //用户私钥，可在控制台获取,修改为自己的UID
 String UID = "";
