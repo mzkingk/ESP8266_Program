@@ -82,7 +82,9 @@ void connectWiFi()
             }
             initWebServer(); // 启动WebServer
 
-            Serial.println("Please connect the WiFi named mzking, the configuration page will pop up automatically, if not, use your browser to access 192.168.4.1");
+            Serial.print("Please connect the WiFi named ");
+            Serial.print(AP_NAME);
+            Serial.println(", the configuration page will pop up automatically, if not, use your browser to access 192.168.4.1");
             break; // 启动WebServer后便跳出while循环，回到loop
         }
         Serial.print(".");

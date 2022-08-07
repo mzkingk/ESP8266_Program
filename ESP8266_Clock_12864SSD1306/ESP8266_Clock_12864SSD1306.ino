@@ -41,7 +41,6 @@ void setup()
     while (!Serial)
         continue;
     Serial.println("NTP Clock oled version v1.1");
-    Serial.println("Designed by mzking");
     initdisplay();
     u8g2.clearBuffer();
     u8g2.setFont(u8g2_font_unifont_t_chinese2);
@@ -50,7 +49,7 @@ void setup()
     u8g2.setCursor(0, 30);
     u8g2.print("connection...");
     u8g2.setCursor(0, 47);
-    u8g2.print("mzking");
+    u8g2.print(AP_NAME);
     u8g2.setCursor(0, 64);
     u8g2.print("192.168.4.1");
     u8g2.sendBuffer();
