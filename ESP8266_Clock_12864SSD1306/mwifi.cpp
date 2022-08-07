@@ -116,36 +116,41 @@ void connectWiFi()
 void handleWifiPost()
 {
     Serial.println("successfully enter handle! save wifi");
-    if (server.hasArg("ssid2"))
-    {
-        strcpy(sta_ssid, server.arg("ssid2").c_str());
-    }
-    else if (server.hasArg("ssid"))
+    if (server.hasArg("ssid"))
     {
         strcpy(sta_ssid, server.arg("ssid").c_str());
     }
-    else
+    if (server.hasArg("uid"))
     {
-        Serial.println("[WebServer]Error, SSID not found!");
-        server.send(200, "text/html", "<meta charset='UTF-8'>Error, SSID not found!"); //返回错误页面
-        return;
+        char tmpUid[32] = {0};
+        strcpy(tmpUid, server.arg("uid").c_str());
+        UID = tmpUid;
     }
-    Serial.printf(PSTR("ssid: %s\n"), sta_ssid);
-
-    if (server.hasArg("password"))
+    if (server.hasArg("topic"))
     {
-        strcpy(sta_password, server.arg("password").c_str());
-        Serial.printf(PSTR("sta_password: %s\n"), sta_password);
-    }
-    else
-    {
-        Serial.println("[WebServer]Error, PASSWORD not found!");
-        server.send(200, "text/html", "<meta charset='UTF-8'>Error, PASSWORD not found!");
-        return;
+        char tmp[32] = {0};
+        strcpy(tmp, server.arg("topic").c_str());
+        TOPIC = tmp;
     }
 
     server.send(200, "text/html", "<meta charset='UTF-8'>提交成功"); //返回保存成功页面
-    delay(2000);
     //一切设定完成，连接wifi
-    connectWiFi();
+    if (server.hasArg("ssid"))
+    {
+        if (server.hasArg("password"))
+        {
+            strcpy(sta_password, server.arg("password").c_str());
+        }
+        if (!server.hasArg("password"))
+        {
+            Serial.println("[WebServer]Error, PASSWORD not found!");
+            server.send(200, "text/html", "<meta charset='UTF-8'>Error, PASSWORD not found!");
+            return;
+        }
+        Serial.printf(PSTR("ssid: %s\n"), sta_ssid);
+        Serial.printf(PSTR("password: %s\n"), sta_password);
+        Serial.printf(PSTR("uid: %s\n"), UID);
+        Serial.printf(PSTR("topic: %s\n"), TOPIC);
+        connectWiFi();
+    }
 }

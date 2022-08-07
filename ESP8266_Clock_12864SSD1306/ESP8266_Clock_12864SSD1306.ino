@@ -37,9 +37,11 @@
 
 void setup()
 {
+    ac.begin(); //开启空调红外
     Serial.begin(115200);
     while (!Serial)
         continue;
+
     Serial.println("NTP Clock oled version v1.1");
     initdisplay();
     Serial.print("Connecting WiFi...");

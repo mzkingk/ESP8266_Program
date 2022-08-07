@@ -7,10 +7,12 @@
 #include <DNSServer.h>
 #include <U8g2lib.h>
 #include <WiFiUdp.h>
+#include <ir_Coolix.h>
 
 #include "html.h"
 #include "mwifi.h"
 #include "server.h"
+#include "irServer.h"
 #include "bemfa.h"
 #include "sysConfig.h"
 #include "oled.h"
@@ -34,6 +36,9 @@ extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2;
 extern char ntpServerName[]; // NTP服务器，阿里云
 
 extern int localPort; // 用于侦听UDP数据包的本地端口
+
+extern uint16_t kIrLed; // 红外发射模块接的数据脚
+extern IRCoolixAC ac;   //建立一个格力空调的控制实例
 
 extern String UID;   //用户私钥，可在控制台获取,修改为自己的UID
 extern String TOPIC; //主题名字，可在控制台新建

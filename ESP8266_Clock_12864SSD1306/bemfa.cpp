@@ -133,7 +133,7 @@ void actionHandler()
 {
     String msg = TcpClient_Buff.substring(TcpClient_Buff.indexOf("&msg=") + 5);
 
-    Serial.printf(PSTR("msg: %s"), msg);
+    irActionHandler(msg);
 
     msg = "";
     Serial.println("action end.");
