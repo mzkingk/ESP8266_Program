@@ -37,7 +37,7 @@ void sendtoTCPServer(String p)
     }
     TCPclient.print(p);
     Serial.println("[Send to TCPServer]:String");
-    Serial.println(p);
+    Serial.print(p);
 }
 
 /*
@@ -119,8 +119,8 @@ void doTCPClientTick()
     if ((TcpClient_Buff.length() >= 1) && (millis() - TcpClient_preTick >= 200))
     { // data ready
         TCPclient.flush();
-        Serial.println("Buff");
-        Serial.println(TcpClient_Buff);
+        Serial.print("Buff:");
+        Serial.print(TcpClient_Buff);
 
         actionHandler();
 
@@ -131,8 +131,10 @@ void doTCPClientTick()
 
 void actionHandler()
 {
-    String msg = TcpClient_Buff.substring(TcpClient_Buff.indexOf("&msg=on"));
+    String msg = TcpClient_Buff.substring(TcpClient_Buff.indexOf("&msg=") + 5);
 
-    Serial.println(msg);
-    Serial.println("handler end");
+    Serial.printf(PSTR("msg: %s"), msg);
+
+    msg = "";
+    Serial.println("action end.");
 }

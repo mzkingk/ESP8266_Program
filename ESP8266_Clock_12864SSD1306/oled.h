@@ -3,9 +3,7 @@
 #define _OLED_H__
 
 time_t getNtpTime();
-void sendNTPpacket(IPAddress &address);
 void oledClockDisplay();
-void sendCommand(int command, int value);
 void initdisplay();
 
 extern unsigned char xing[] U8X8_PROGMEM;

@@ -7,11 +7,10 @@
 #include "global.h"
 #include "oled.h"
 
-time_t getNtpTime();
 void sendNTPpacket(IPAddress &address);
-void oledClockDisplay();
-void sendCommand(int command, int value);
-void initdisplay();
+
+String getCurrentTime(int hours, int minutes, int seconds);
+String getCurrentDay(int years, int months, int days);
 
 int isNTPConnected = 0;
 
@@ -62,28 +61,8 @@ void oledClockDisplay()
         u8g2.print("Network Error!");
     }
 
-    String currentTime = "";
-    if (hours < 10)
-        currentTime += 0;
-    currentTime += hours;
-    currentTime += ":";
-    if (minutes < 10)
-        currentTime += 0;
-    currentTime += minutes;
-    currentTime += ":";
-    if (seconds < 10)
-        currentTime += 0;
-    currentTime += seconds;
-    String currentDay = "";
-    currentDay += years;
-    currentDay += "/";
-    if (months < 10)
-        currentDay += 0;
-    currentDay += months;
-    currentDay += "/";
-    if (days < 10)
-        currentDay += 0;
-    currentDay += days;
+    String currentTime = getCurrentTime(hours, minutes, seconds);
+    String currentDay = getCurrentDay(years, months, days);
 
     u8g2.setFont(u8g2_font_logisoso24_tr);
     u8g2.setCursor(0, 44);
@@ -171,4 +150,36 @@ void sendNTPpacket(IPAddress &address)
     Udp.beginPacket(address, 123); // NTP需要使用的UDP端口号为123
     Udp.write(packetBuffer, NTP_PACKET_SIZE);
     Udp.endPacket();
+}
+
+String getCurrentTime(int hours, int minutes, int seconds)
+{
+    String currentTime = "";
+    if (hours < 10)
+        currentTime += 0;
+    currentTime += hours;
+    currentTime += ":";
+    if (minutes < 10)
+        currentTime += 0;
+    currentTime += minutes;
+    currentTime += ":";
+    if (seconds < 10)
+        currentTime += 0;
+    currentTime += seconds;
+    return currentTime;
+}
+
+String getCurrentDay(int years, int months, int days)
+{
+    String currentDay = "";
+    currentDay += years;
+    currentDay += "/";
+    if (months < 10)
+        currentDay += 0;
+    currentDay += months;
+    currentDay += "/";
+    if (days < 10)
+        currentDay += 0;
+    currentDay += days;
+    return currentDay;
 }
