@@ -11,6 +11,7 @@ void sendNTPpacket(IPAddress &address);
 
 String getCurrentTime(int hours, int minutes, int seconds);
 String getCurrentDay(int years, int months, int days);
+void printWeekDay(int weekdays);
 
 int isNTPConnected = 0;
 
@@ -73,20 +74,7 @@ void oledClockDisplay()
     u8g2.drawXBM(80, 48, 16, 16, xing);
     u8g2.setCursor(95, 62);
     u8g2.print("期");
-    if (weekdays == 1)
-        u8g2.print("日");
-    else if (weekdays == 2)
-        u8g2.print("一");
-    else if (weekdays == 3)
-        u8g2.print("二");
-    else if (weekdays == 4)
-        u8g2.print("三");
-    else if (weekdays == 5)
-        u8g2.print("四");
-    else if (weekdays == 6)
-        u8g2.print("五");
-    else if (weekdays == 7)
-        u8g2.drawXBM(111, 49, 16, 16, liu);
+    printWeekDay(weekdays);
     u8g2.sendBuffer();
 }
 
@@ -182,4 +170,22 @@ String getCurrentDay(int years, int months, int days)
         currentDay += 0;
     currentDay += days;
     return currentDay;
+}
+
+void printWeekDay(int weekdays)
+{
+    if (weekdays == 1)
+        u8g2.print("日");
+    else if (weekdays == 2)
+        u8g2.print("一");
+    else if (weekdays == 3)
+        u8g2.print("二");
+    else if (weekdays == 4)
+        u8g2.print("三");
+    else if (weekdays == 5)
+        u8g2.print("四");
+    else if (weekdays == 6)
+        u8g2.print("五");
+    else if (weekdays == 7)
+        u8g2.drawXBM(111, 49, 16, 16, liu);
 }
