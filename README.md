@@ -1,7 +1,22 @@
-# ESP8266_Network_Clock
-Use 7-Seg LED, 1602 LCD, 12864 display, LED Dot Matrix and ESP8266 NodeMCU to make a network clock  
-Demo: https://www.bilibili.com/video/av50338779  
-      https://www.bilibili.com/video/BV1Cy4y177h9
+# ESP8266_Program
+支持按需裁剪的esp8266练手项目合集
 
-Arduino Time Library: https://github.com/PaulStoffregen/Time  
-Arduino Timezone Library: https://github.com/JChristensen/Timezone  
+## ESP8266_Clock_12864SSD1306
+0.96寸显示屏+红外二极管，二合一项目
+- 对接了巴法云，支持在小程序或巴法云的控制台上，对美的空调进行"开关切换/温度调整/模式切换"等控制操作  
+通道已经完善，也可以自己对接天猫精灵/小爱进行语音控制
+- 显示屏分三行，分别显示“网络状态/时分秒/年月日”
+
+## ESP8266_Coolix
+空调红外遥控项目(默认美的，也可自己改成其它的)
+- 第一个项目的简化版，去掉了显示屏，开销更小了
+- 同时该项目支持在没有网络的情况下，连上模块创建出来的wifi去进行控制空调
+
+## ESP8266_Gree
+已经舍弃的格力空调练手项目，按要求配置后，勉强还能用
+
+## ESP8266_Network_Clock_12864SSD1306
+已经舍弃的显示器项目
+
+## ESP8266_Network_Clock_7SEGMAX7219
+已经舍弃的显示器项目
