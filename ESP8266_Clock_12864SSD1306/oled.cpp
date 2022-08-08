@@ -50,7 +50,7 @@ void oledClockDisplay()
     minutes = minute();
     seconds = second();
     weekdays = weekday();
-    Serial.printf("%d/%d/%d %d:%d:%d Weekday:%d\n", years, months, days, hours, minutes, seconds, weekdays);
+
     u8g2.clearBuffer();
     u8g2.setFont(u8g2_font_unifont_t_chinese2);
     u8g2.setCursor(0, 14);

@@ -62,6 +62,9 @@ String wiFiScan()
 
 void connectWiFi()
 {
+    Serial.printf(PSTR("ssid: %s\n"), sta_ssid);
+    Serial.printf(PSTR("password: %s\n"), sta_password);
+
     WiFi.mode(WIFI_STA);       //切换为STA模式
     WiFi.setAutoConnect(true); //设置自动连接
     WiFi.begin(sta_ssid, sta_password);
@@ -69,10 +72,10 @@ void connectWiFi()
     int count = 0;
     while (WiFi.status() != WL_CONNECTED)
     {
-        delay(500);
+        delay(1000);
         count++;
         if (count > 20)
-        { // 10秒过去依然没有自动连上，开启Web配网功能，可视情况调整等待时长
+        { // n秒过去依然没有自动连上，开启Web配网功能，可视情况调整等待时长
             Serial.println("Timeout! AutoConnect failed");
             WiFi.mode(WIFI_AP); //开热点
             WiFi.softAPConfig(apIP, apIP, subnet);

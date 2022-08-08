@@ -14,7 +14,6 @@
 #include "server.h"
 #include "irServer.h"
 #include "bemfa.h"
-#include "sysConfig.h"
 #include "oled.h"
 
 extern WiFiUDP Udp;

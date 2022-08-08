@@ -44,16 +44,12 @@ void setup()
 
     Serial.println("NTP Clock oled version v1.1");
     initdisplay();
-    Serial.print("Connecting WiFi...");
-    loadConfig();
-    Serial.print("Connecting WiFi...");
+
     WiFi.hostname("Smart-ESP8266");
     connectWiFi();
-    Serial.println("Starting UDP");
+
     Udp.begin(localPort);
-    Serial.print("Local port: ");
-    Serial.println(Udp.localPort());
-    Serial.println("waiting for sync");
+
     setSyncProvider(getNtpTime);
     setSyncInterval(30); //每300秒同步一次时间
 }
