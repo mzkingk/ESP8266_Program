@@ -11,7 +11,7 @@
 #define TCP_SERVER_PORT "8344"
 
 // 最大字节数
-#define MAX_PACKETSIZE 512
+#define MAX_PACKETSIZE 64
 // 设置心跳值30s
 #define KEEPALIVEATIME 15 * 1000
 
@@ -132,23 +132,17 @@ void doTCPClientTick()
 void actionHandler()
 {
     String msg = TcpClient_Buff.substring(TcpClient_Buff.indexOf("&msg=") + 5);
-    ledActionHandler(msg);
-    msg = "";
-    Serial.println("action end.");
-}
 
-void ledActionHandler(String msg)
-{
     Serial.printf(PSTR("msg: %s"), msg);
     if (msg.indexOf("on") >= 0)
     {
         digitalWrite(LEDPIN, LOW);
-        Serial.println("open success");
+        Serial.printf("open success");
     }
     else if (msg.indexOf("off") >= 0)
     {
         digitalWrite(LEDPIN, HIGH);
-        Serial.println("close success");
+        Serial.printf("close success");
     }
-    Serial.println("handler end");
+    msg = "";
 }

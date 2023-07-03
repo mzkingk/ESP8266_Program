@@ -11,6 +11,4 @@ void sendtoTCPServer(String p);
 // 控制函数
 void actionHandler();
 
-void ledActionHandler(String msg);
-
 #endif
