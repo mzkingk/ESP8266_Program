@@ -11,18 +11,11 @@
 void setup()
 {
     Serial.begin(115200);
-    while (!Serial)
-        continue;
-
     Serial.println("version v1.1");
-
     WiFi.hostname(HOST_NAME);
     connectWiFi();
-
     Udp.begin(LOCAL_PORT);
-
     pinMode(LEDPIN, OUTPUT); // 初始化
-
     setSyncInterval(60);
 }
 

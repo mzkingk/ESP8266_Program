@@ -16,25 +16,16 @@ String wiFiScan()
     int scanResult;
 
     Serial.println(F("Starting WiFi scan..."));
-
     scanResult = WiFi.scanNetworks(/*async=*/false, /*hidden=*/true);
-
-    if (scanResult == 0)
-    {
-        Serial.println(F("No networks found"));
-    }
-    else if (scanResult > 0)
+    if (scanResult >= 0)
     {
         Serial.printf(PSTR("%d networks found:\n"), scanResult);
-
         String list = String("[\"");
         for (int8_t i = 0; i < scanResult; i++)
         {
             WiFi.getNetworkInfo(i, ssid, encryptionType, rssi, bssid, channel, hidden);
-
-            Serial.printf(PSTR("               %ddBm %s\n"), rssi, ssid.c_str());
+            Serial.printf(PSTR("%ddBm %s\n"), rssi, ssid.c_str());
             yield();
-
             if (ssid.length() > 0)
             {
                 String str = String((int)rssi);
@@ -44,19 +35,15 @@ String wiFiScan()
                 list += "\",\"";
             }
         }
-
         if (list.length() > 2)
         {
             list.remove(list.length() - 2);
         }
         list += "]";
-
         return list;
     }
-    else
-    {
-        Serial.printf(PSTR("WiFi scan error %d"), scanResult);
-    }
+
+    Serial.printf(PSTR("WiFi scan error %d"), scanResult);
     return "[]";
 }
 
@@ -65,8 +52,8 @@ void connectWiFi()
     Serial.printf(PSTR("ssid: %s\n"), sta_ssid);
     Serial.printf(PSTR("password: %s\n"), sta_password);
 
-    WiFi.mode(WIFI_STA);       //切换为STA模式
-    WiFi.setAutoConnect(true); //设置自动连接
+    WiFi.mode(WIFI_STA);       // 切换为STA模式
+    WiFi.setAutoConnect(true); // 设置自动连接
     WiFi.begin(sta_ssid, sta_password);
     Serial.println("Connect WiFi");
     int count = 0;
@@ -74,10 +61,10 @@ void connectWiFi()
     {
         delay(1000);
         count++;
-        if (count > 3600)
+        if (count > RETRY_COUNT)
         { // n秒过去依然没有自动连上，开启Web配网功能，可视情况调整等待时长
             Serial.println("Timeout! AutoConnect failed");
-            WiFi.mode(WIFI_AP); //开热点
+            WiFi.mode(WIFI_AP); // 开热点
             WiFi.softAPConfig(apIP, apIP, subnet);
             if (WiFi.softAP(AP_NAME, AP_PWD, 7))
             {
@@ -109,8 +96,6 @@ void connectWiFi()
     {
         Serial.printf("WiFi Connected!\nIP address: ");
         Serial.println(WiFi.localIP());
-        // WiFi连接成功后，热点便不再开启，如需要更换WiFi，请通过局域网ip访问web页面重新配置
-        //若WiFi连接断开，ESP8266会自动尝试重新连接，直至连接成功，无需代码干预
     }
 }
 
@@ -135,8 +120,8 @@ void handleWifiPost()
         TOPIC = tmp;
     }
 
-    server.send(200, "text/html", "<meta charset='UTF-8'>提交成功"); //返回保存成功页面
-    //一切设定完成，连接wifi
+    server.send(200, "text/html", "<meta charset='UTF-8'>提交成功"); // 返回保存成功页面
+    // 一切设定完成，连接wifi
     if (server.hasArg("ssid"))
     {
         if (server.hasArg("password"))

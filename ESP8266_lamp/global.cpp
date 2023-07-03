@@ -19,16 +19,14 @@ IPAddress subnet(255, 255, 255, 0);
 char sta_ssid[32] = "";
 // 默认连接的WiFi密码
 char sta_password[64] = "";
-
+// wifi重试次数
+int RETRY_COUNT = 3600;
 // 自定义热点密码，避免其他人也能连接该wifi
-char *AP_PWD = "esp-8266";
-
+String AP_PWD = "esp-8266";
 // 用于侦听UDP数据包的本地端口
 int LOCAL_PORT = 8888;
-
 // 端口
 uint16_t LEDPIN = 0;
-
 // 用户私钥，可在控制台获取,修改为自己的UID
 String UID = "";
 
@@ -37,6 +35,6 @@ String UID = "";
 // 主题名字，可在巴法云控制台新建
 String TOPIC = "myRoomLed002";
 // 自定义8266AP热点名
-char *AP_NAME = "esp-8266-my-room";
+String AP_NAME = "esp-8266-my-room";
 // 主机名
-char *HOST_NAME = "esp-8266-my-room";
+String HOST_NAME = "esp-8266-my-room";

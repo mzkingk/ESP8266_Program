@@ -29,7 +29,6 @@ bool preTCPConnected = false;
  */
 void sendtoTCPServer(String p)
 {
-
     if (!TCPclient.connected())
     {
         Serial.println("Client is not readly");
@@ -76,32 +75,33 @@ void doTCPClientTick()
 {
     // 检查是否断开，断开后重连
     if (WiFi.status() != WL_CONNECTED)
+    {
         return;
+    }
 
     if (!TCPclient.connected())
-    { // 断开重连
-
+    {
+        // 重连
         if (preTCPConnected == true)
         {
-
             preTCPConnected = false;
             preTCPStartTick = millis();
-            Serial.println();
             Serial.println("TCP Client disconnected.");
             TCPclient.stop();
         }
         else if (millis() - preTCPStartTick > 1 * 1000) // 重新连接
+        {
             startTCPClient();
+        }
     }
     else
     {
         if (TCPclient.available())
-        { // 收数据
-            char c = TCPclient.read();
+        {
+            char c = TCPclient.read(); // 收数据
             TcpClient_Buff += c;
             TcpClient_BuffIndex++;
             TcpClient_preTick = millis();
-
             if (TcpClient_BuffIndex >= MAX_PACKETSIZE - 1)
             {
                 TcpClient_BuffIndex = MAX_PACKETSIZE - 2;
@@ -110,20 +110,18 @@ void doTCPClientTick()
             preHeartTick = millis();
         }
         if (millis() - preHeartTick >= KEEPALIVEATIME)
-        { // 保持心跳
+        {
             preHeartTick = millis();
             Serial.println("--Keep alive:");
             sendtoTCPServer("cmd=0&msg=keep\r\n");
         }
     }
     if ((TcpClient_Buff.length() >= 1) && (millis() - TcpClient_preTick >= 1000))
-    { // data ready
+    {
         TCPclient.flush();
         Serial.print("Buff:");
         Serial.print(TcpClient_Buff);
-
         actionHandler();
-
         TcpClient_Buff = "";
         TcpClient_BuffIndex = 0;
     }
@@ -132,17 +130,16 @@ void doTCPClientTick()
 void actionHandler()
 {
     String msg = TcpClient_Buff.substring(TcpClient_Buff.indexOf("&msg=") + 5);
-
     Serial.printf(PSTR("msg: %s"), msg);
     if (msg.indexOf("on") >= 0)
     {
         digitalWrite(LEDPIN, LOW);
-        Serial.printf("open success");
+        Serial.printf("open success\n");
     }
     else if (msg.indexOf("off") >= 0)
     {
         digitalWrite(LEDPIN, HIGH);
-        Serial.printf("close success");
+        Serial.printf("close success\n");
     }
     msg = "";
 }

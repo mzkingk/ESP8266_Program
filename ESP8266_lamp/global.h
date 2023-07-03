@@ -23,8 +23,9 @@ extern IPAddress subnet;
 
 extern char sta_ssid[32];     // 暂存WiFi名
 extern char sta_password[64]; // 暂存WiFi密码
-extern char *AP_NAME;         // 自定义8266AP热点名
-extern char *AP_PWD;          // 自定义热点密码，避免其他人也能连接该wifi
+extern int RETRY_COUNT;       // wifi重试次数
+extern String AP_NAME;         // 自定义8266AP热点名
+extern String AP_PWD;          // 自定义热点密码，避免其他人也能连接该wifi
 
 extern int LOCAL_PORT; // 用于侦听UDP数据包的本地端口
 extern uint16_t LEDPIN;
@@ -32,6 +33,6 @@ extern uint16_t LEDPIN;
 extern String UID;   // 用户私钥，可在控制台获取,修改为自己的UID
 extern String TOPIC; // 主题名字，可在控制台新建
 
-extern char *HOST_NAME;// 主机名
+extern String HOST_NAME; // 主机名
 
 #endif
