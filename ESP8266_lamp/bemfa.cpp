@@ -12,8 +12,8 @@
 
 // 最大字节数
 #define MAX_PACKETSIZE 64
-// 设置心跳值30s
-#define KEEPALIVEATIME 15 * 1000
+// 设置心跳值
+#define KEEPALIVEATIME 30 * 1000
 
 // tcp客户端相关初始化，默认即可
 WiFiClient TCPclient;
@@ -134,11 +134,13 @@ void actionHandler()
     if (msg.indexOf("on") >= 0)
     {
         digitalWrite(LEDPIN, LOW);
+        digitalWrite(LED_BUILTIN, HIGH);
         Serial.printf("open success\n");
     }
     else if (msg.indexOf("off") >= 0)
     {
         digitalWrite(LEDPIN, HIGH);
+        digitalWrite(LED_BUILTIN, LOW);
         Serial.printf("close success\n");
     }
     msg = "";

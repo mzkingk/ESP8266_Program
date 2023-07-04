@@ -15,6 +15,7 @@ void setup()
     WiFi.hostname(HOST_NAME);
     connectWiFi();
     Udp.begin(LOCAL_PORT);
+    pinMode(LED_BUILTIN,OUTPUT);
     pinMode(LEDPIN, OUTPUT); // 初始化
     setSyncInterval(60);
 }
