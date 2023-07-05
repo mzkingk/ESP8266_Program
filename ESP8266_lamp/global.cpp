@@ -21,20 +21,17 @@ char sta_ssid[32] = "";
 char sta_password[64] = "";
 // wifi重试次数
 int RETRY_COUNT = 3600;
-// 自定义热点密码，避免其他人也能连接该wifi
-String AP_PWD = "esp-8266";
 // 用于侦听UDP数据包的本地端口
-int LOCAL_PORT = 8888;
+int LOCAL_PORT = 8266;
 // 端口
 uint16_t LEDPIN = 0;
-// 用户私钥，可在控制台获取,修改为自己的UID
-String UID = "";
 
-/*----------------- 以下是 每一个8366都要不重复的参数 --------------------*/
+// 根据需要修改的信息
+String bemfa_type = "002";    // 设备类型
+String bemfa_name = "灯"; // 设备昵称，可随意修改
+String bemfa_proto = "3";     // 3是tcp设备端口8344,1是MQTT设备
 
-// 主题名字，可在巴法云控制台新建
-String TOPIC = "myRoomLed002";
-// 自定义8266AP热点名
-String AP_NAME = "esp-8266-my-room";
+/*----------------- 以下是 每一个8366都不重复的参数 --------------------*/
+
 // 主机名
 String HOST_NAME = "esp-8266-my-room";

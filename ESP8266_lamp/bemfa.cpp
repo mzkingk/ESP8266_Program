@@ -11,7 +11,7 @@
 #define TCP_SERVER_PORT "8344"
 
 // 最大字节数
-#define MAX_PACKETSIZE 64
+#define MAX_PACKETSIZE 256
 // 设置心跳值
 #define KEEPALIVEATIME 30 * 1000
 
@@ -48,11 +48,11 @@ void startTCPClient()
     {
         Serial.print("\nConnected to server:");
         Serial.printf("%s:%d\r\n", TCP_SERVER_ADDR, atoi(TCP_SERVER_PORT));
-
-        String tcpTemp = "";                                       // 初始化字符串
-        tcpTemp = "cmd=1&uid=" + UID + "&topic=" + TOPIC + "\r\n"; // 构建订阅指令
-        sendtoTCPServer(tcpTemp);                                  // 发送订阅指令
-        tcpTemp = "";                                              // 清空
+        String su(config.cuid);
+        String tcpTemp = "";
+        tcpTemp = "cmd=1&uid=" + su + "&topic=" + config.ctopic + "\r\n"; // 构建订阅指令
+        sendtoTCPServer(tcpTemp);                                         // 发送订阅指令
+        tcpTemp = "";                                                     // 清空
 
         preTCPConnected = true;
         preHeartTick = millis();

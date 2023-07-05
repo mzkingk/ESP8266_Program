@@ -1,81 +1,174 @@
 #include <Arduino.h>
 
-#include <ESP8266WiFi.h>
-
 #include "mwifi.h"
 #include "global.h"
 
-String wiFiScan()
-{
-    String ssid;
-    int32_t rssi;
-    uint8_t encryptionType;
-    uint8_t *bssid;
-    int32_t channel;
-    bool hidden;
-    int scanResult;
+char config_flag = 0;   // 判断是否配网
+char packetBuffer[255]; // 发送数据包
+Ticker delayTimer;
 
-    Serial.println(F("Starting WiFi scan..."));
-    scanResult = WiFi.scanNetworks(/*async=*/false, /*hidden=*/true);
-    if (scanResult >= 0)
+// 从EEPROM加载参数
+uint8_t *p = (uint8_t *)(&config);
+
+void loadConfig()
+{
+
+    uint8_t mac[6];
+    Serial.println(" LoadConfig.......");
+    WiFi.macAddress(mac);
+    EEPROM.begin(512);
+    for (int i = 0; i < sizeof(config); i++)
     {
-        Serial.printf(PSTR("%d networks found:\n"), scanResult);
-        String list = String("[\"");
-        for (int8_t i = 0; i < scanResult; i++)
+        *(p + i) = EEPROM.read(i);
+    }
+    config.reboot = config.reboot + 1;
+    if (config.reboot >= 4)
+    {
+        restoreFactory();
+    }
+    if (config.magic != 0xAA)
+    {
+        config_flag = 1;
+    }
+    EEPROM.begin(512);
+    for (int i = 0; i < sizeof(config); i++)
+    {
+        EEPROM.write(i, *(p + i));
+    }
+    EEPROM.commit();
+    delay(2000);
+    Serial.println("loadConfig Over");
+    EEPROM.begin(512);
+    config.reboot = 0;
+    for (int i = 0; i < sizeof(config); i++)
+    {
+        EEPROM.write(i, *(p + i));
+    }
+    EEPROM.commit();
+}
+
+// 恢复出厂设置
+void restoreFactory()
+{
+    Serial.println("\r\n Restore Factory....... ");
+    config.magic = 0x00;
+    strcpy(config.stassid, "");
+    strcpy(config.stapsw, "");
+    strcpy(config.cuid, "");
+    strcpy(config.ctopic, "");
+    config.magic = 0x00;
+    saveConfig();
+    delayRestart(1);
+    while (1)
+    {
+        ESP.wdtFeed();
+        delay(100);
+    }
+}
+
+// 保存WIFI信息
+void saveConfig()
+{
+    config.reboot = 0;
+    EEPROM.begin(2018);
+    uint8_t *p = (uint8_t *)(&config);
+    for (int i = 0; i < sizeof(config); i++)
+    {
+        EEPROM.write(i, *(p + i));
+    }
+    EEPROM.commit();
+}
+
+void delayRestart(float t)
+{
+    delayTimer.attach(t, []()
+                      { ESP.restart(); });
+}
+void apConfig()
+{
+    String mac = WiFi.macAddress().substring(8); // 取mac地址做主题用
+    mac.replace(":", "");                        // 去掉:号
+    if (config_flag == 1)
+    {
+        WiFi.softAP("bemfa_" + mac);
+        Udp.begin(LOCAL_PORT);
+        Serial.println("Started Ap Config...please connect with wechat");
+    }
+    String topic = mac + bemfa_type;
+    while (config_flag)
+    {
+        // 如果未配网，开启AP配网，并接收配网信息
+        int packetSize = Udp.parsePacket();
+        if (packetSize)
         {
-            WiFi.getNetworkInfo(i, ssid, encryptionType, rssi, bssid, channel, hidden);
-            Serial.printf(PSTR("%ddBm %s\n"), rssi, ssid.c_str());
-            yield();
-            if (ssid.length() > 0)
+            Serial.print("Received packet from ");
+            Serial.print(Udp.remoteIP());
+
+            int len = Udp.read(packetBuffer, 255);
+            if (len > 0)
             {
-                String str = String((int)rssi);
-                list += str;
-                list += "dBm ";
-                list += ssid.c_str();
-                list += "\",\"";
+                packetBuffer[len] = 0;
+            }
+            Serial.println("Contents:");
+            Serial.println(packetBuffer);
+            StaticJsonDocument<200> doc;
+            DeserializationError error = deserializeJson(doc, packetBuffer);
+            if (error)
+            {
+                Serial.print(F("deserializeJson() failed: "));
+                Serial.println(error.f_str());
+                return;
+            }
+            int cmdType = doc["cmdType"].as<int>();
+            if (cmdType == 1)
+            {
+                const char *ssid = doc["ssid"];
+                const char *password = doc["password"];
+                const char *token = doc["token"];
+                Serial.println(ssid);
+                strcpy(config.stassid, ssid);
+                strcpy(config.stapsw, password);
+                strcpy(config.cuid, token);
+                config.reboot = 0;
+                config.magic = 0xAA;
+                strcpy(config.ctopic, topic.c_str());
+                saveConfig();
+                // 收到信息，并回复
+                String reply_buffer = "{\"cmdType\":2,\"productId\":\"" + topic + "\",\"deviceName\":\"" + bemfa_name + "\",\"protoVersion\":\"" + bemfa_proto + "\"}";
+                Serial.println(reply_buffer);
+                Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+                Udp.write(reply_buffer.c_str());
+                Udp.endPacket();
+                break;
+            }
+            else if (cmdType == 3)
+            {
+                config_flag = 0;
+                WiFi.softAPdisconnect(true);
             }
         }
-        if (list.length() > 2)
-        {
-            list.remove(list.length() - 2);
-        }
-        list += "]";
-        return list;
     }
-
-    Serial.printf(PSTR("WiFi scan error %d"), scanResult);
-    return "[]";
 }
 
 void connectWiFi()
 {
-    Serial.printf(PSTR("ssid: %s\n"), sta_ssid);
-    Serial.printf(PSTR("password: %s\n"), sta_password);
-
+    WiFi.disconnect();         // 断开连接
     WiFi.mode(WIFI_STA);       // 切换为STA模式
     WiFi.setAutoConnect(true); // 设置自动连接
-    WiFi.begin(sta_ssid, sta_password);
+    WiFi.begin(config.stassid, config.stapsw);
     Serial.println("Connect WiFi");
+    Serial.printf(PSTR("ssid: %s\n"), config.stassid);
     int count = 0;
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(1000);
         count++;
         if (count > RETRY_COUNT)
-        { // n秒过去依然没有自动连上，开启Web配网功能，可视情况调整等待时长
+        {
+            // n秒过去依然没有自动连上，开启Web配网功能，可视情况调整等待时长
             Serial.println("Timeout! AutoConnect failed");
-            WiFi.mode(WIFI_AP); // 开热点
-            WiFi.softAPConfig(apIP, apIP, subnet);
-            if (WiFi.softAP(AP_NAME, AP_PWD, 7))
-            {
-                Serial.println("ESP8266 SoftAP is on");
-            }
-            initWebServer(); // 启动WebServer
-
-            Serial.print("Please connect the WiFi named ");
-            Serial.print(AP_NAME);
-            Serial.println(", the configuration page will pop up automatically, if not, use your browser to access 192.168.4.1");
-            break; // 启动WebServer后便跳出while循环，回到loop
+            restoreFactory();
+            break;
         }
         Serial.print(".");
         if (WiFi.status() == WL_CONNECT_FAILED)
@@ -96,48 +189,5 @@ void connectWiFi()
     {
         Serial.printf("WiFi Connected!\nIP address: ");
         Serial.println(WiFi.localIP());
-    }
-}
-
-// wifi页提交
-void handleWifiPost()
-{
-    Serial.println("successfully enter handle! save wifi");
-    if (server.hasArg("ssid"))
-    {
-        strcpy(sta_ssid, server.arg("ssid").c_str());
-    }
-    if (server.hasArg("uid"))
-    {
-        char tmpUid[32] = {0};
-        strcpy(tmpUid, server.arg("uid").c_str());
-        UID = tmpUid;
-    }
-    if (server.hasArg("topic"))
-    {
-        char tmp[32] = {0};
-        strcpy(tmp, server.arg("topic").c_str());
-        TOPIC = tmp;
-    }
-
-    server.send(200, "text/html", "<meta charset='UTF-8'>提交成功"); // 返回保存成功页面
-    // 一切设定完成，连接wifi
-    if (server.hasArg("ssid"))
-    {
-        if (server.hasArg("password"))
-        {
-            strcpy(sta_password, server.arg("password").c_str());
-        }
-        if (!server.hasArg("password"))
-        {
-            Serial.println("[WebServer]Error, PASSWORD not found!");
-            server.send(200, "text/html", "<meta charset='UTF-8'>Error, PASSWORD not found!");
-            return;
-        }
-        Serial.printf(PSTR("ssid: %s\n"), sta_ssid);
-        Serial.printf(PSTR("password: %s\n"), sta_password);
-        Serial.printf(PSTR("uid: %s\n"), UID);
-        Serial.printf(PSTR("topic: %s\n"), TOPIC);
-        connectWiFi();
     }
 }
