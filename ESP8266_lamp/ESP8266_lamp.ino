@@ -30,12 +30,12 @@ void setup()
 
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(LEDPIN, OUTPUT); // 初始化
-    setSyncInterval(60);
+    setSyncInterval(100);
 }
 
 void loop()
 {
     dnsServer.processNextRequest();
     // bemfa模块使用
-    doTCPClientTick();
+    do_client_tick();
 }

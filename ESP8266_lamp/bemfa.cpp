@@ -11,137 +11,122 @@
 #define TCP_SERVER_PORT "8344"
 
 // 最大字节数
-#define MAX_PACKETSIZE 256
+#define MAX_PACKETSIZE 128
 // 设置心跳值
 #define KEEPALIVEATIME 30 * 1000
 
 // tcp客户端相关初始化，默认即可
-WiFiClient TCPclient;
-String TcpClient_Buff = "";
-unsigned int TcpClient_BuffIndex = 0;
-unsigned long TcpClient_preTick = 0;
-unsigned long preHeartTick = 0;    // 心跳
-unsigned long preTCPStartTick = 0; // 连接
-bool preTCPConnected = false;
+WiFiClient tcp_client;
+String client_buff = "";
+unsigned int client_buff_idx = 0;
+unsigned long client_pre_tick = 0;
+unsigned long pre_heart_tick = 0; // 心跳
+unsigned long pre_start_tick = 0; // 连接
+bool pre_connected = false;
 
-/*
- *发送数据到TCP服务器
- */
-void sendtoTCPServer(String p)
+// 发送数据到TCP服务器
+void send_to_server(String p)
 {
-    if (!TCPclient.connected())
+    if (!tcp_client.connected())
     {
         Serial.println("Client is not readly");
         return;
     }
-    TCPclient.print(p);
-    Serial.println("[Send to TCPServer]:String");
+    tcp_client.print(p);
+    Serial.print("Send to TCPServer: ");
     Serial.print(p);
 }
 
-/*
- *初始化和服务器建立连接
- */
-void startTCPClient()
+// 初始化和服务器建立连接
+void start_tcp_client()
 {
-    if (TCPclient.connect(TCP_SERVER_ADDR, atoi(TCP_SERVER_PORT)))
+    if (tcp_client.connect(TCP_SERVER_ADDR, atoi(TCP_SERVER_PORT)))
     {
         Serial.print("\nConnected to server:");
         Serial.printf("%s:%d\r\n", TCP_SERVER_ADDR, atoi(TCP_SERVER_PORT));
         String su(config.cuid);
         String tcpTemp = "";
         tcpTemp = "cmd=1&uid=" + su + "&topic=" + config.ctopic + "\r\n"; // 构建订阅指令
-        sendtoTCPServer(tcpTemp);                                         // 发送订阅指令
+        send_to_server(tcpTemp);                                         // 发送订阅指令
         tcpTemp = "";                                                     // 清空
 
-        preTCPConnected = true;
-        preHeartTick = millis();
-        TCPclient.setNoDelay(true);
+        pre_connected = true;
+        pre_heart_tick = millis();
+        tcp_client.setNoDelay(true);
     }
     else
     {
         Serial.print("Failed connected to server:");
         Serial.println(TCP_SERVER_ADDR);
-        TCPclient.stop();
-        preTCPConnected = false;
+        tcp_client.stop();
+        pre_connected = false;
     }
-    preTCPStartTick = millis();
+    pre_start_tick = millis();
 }
 
-/*
- *检查数据，发送心跳
- */
-void doTCPClientTick()
+// 检查数据，发送心跳
+void do_client_tick()
 {
-    // 检查是否断开，断开后重连
     if (WiFi.status() != WL_CONNECTED)
     {
         return;
     }
-
-    if (!TCPclient.connected())
+    else if (!tcp_client.connected())
     {
-        // 重连
-        if (preTCPConnected == true)
+        if (pre_connected == true)
         {
-            preTCPConnected = false;
-            preTCPStartTick = millis();
+            pre_connected = false;
+            pre_start_tick = millis();
             Serial.println("TCP Client disconnected.");
-            TCPclient.stop();
+            tcp_client.stop();
         }
-        else if (millis() - preTCPStartTick > 1 * 1000) // 重新连接
+        else if (millis() - pre_start_tick > 1 * 1000) // 重新连接
         {
-            startTCPClient();
+            start_tcp_client();
         }
+        return;
     }
-    else
+
+    if (tcp_client.available())
     {
-        if (TCPclient.available())
+        char c = tcp_client.read(); // 收数据
+        client_buff += c;
+        client_buff_idx++;
+        client_pre_tick = millis();
+        if (client_buff_idx >= MAX_PACKETSIZE - 1)
         {
-            char c = TCPclient.read(); // 收数据
-            TcpClient_Buff += c;
-            TcpClient_BuffIndex++;
-            TcpClient_preTick = millis();
-            if (TcpClient_BuffIndex >= MAX_PACKETSIZE - 1)
-            {
-                TcpClient_BuffIndex = MAX_PACKETSIZE - 2;
-                TcpClient_preTick = TcpClient_preTick - 200;
-            }
-            preHeartTick = millis();
+            client_buff_idx = MAX_PACKETSIZE - 2;
+            client_pre_tick = client_pre_tick - 200;
         }
-        if (millis() - preHeartTick >= KEEPALIVEATIME)
-        {
-            preHeartTick = millis();
-            Serial.println("--Keep alive:");
-            sendtoTCPServer("cmd=0&msg=keep\r\n");
-        }
+        pre_heart_tick = millis();
     }
-    if ((TcpClient_Buff.length() >= 1) && (millis() - TcpClient_preTick >= 1000))
+    if (millis() - pre_heart_tick >= KEEPALIVEATIME)
     {
-        TCPclient.flush();
-        Serial.print("Buff:");
-        Serial.print(TcpClient_Buff);
-        actionHandler();
-        TcpClient_Buff = "";
-        TcpClient_BuffIndex = 0;
+        pre_heart_tick = millis();
+        send_to_server("cmd=0&msg=keep\r\n");
     }
+    if ((client_buff.length() < 10) || (millis() - client_pre_tick < 500))
+    {
+        return;
+    }
+
+    tcp_client.flush();
+    Serial.print("Buff:");
+    Serial.print(client_buff);
+    if (client_buff.length() > 16)
+    {
+        action_handler();
+    }
+    client_buff = "";
+    client_buff_idx = 0;
 }
 
-void actionHandler()
+void action_handler()
 {
-    String msg = TcpClient_Buff.substring(TcpClient_Buff.indexOf("&msg=") + 5);
-    Serial.printf(PSTR("msg: %s"), msg);
-    if (msg.indexOf("on") >= 0)
-    {
-        digitalWrite(LEDPIN, LOW);
-        digitalWrite(LED_BUILTIN, HIGH);
-        Serial.printf("open success\n");
-    }
-    else if (msg.indexOf("off") >= 0)
-    {
-        digitalWrite(LEDPIN, HIGH);
-        digitalWrite(LED_BUILTIN, LOW);
-        Serial.printf("close success\n");
-    }
+    String msg = client_buff.substring(client_buff.indexOf("&msg=") + 5);
+    bool status = msg.indexOf("on") >= 0;
+    digitalWrite(LEDPIN, status ? LOW : HIGH);      // 端口
+    digitalWrite(LED_BUILTIN, status ? HIGH : LOW); // 状态灯
+    Serial.printf("its %s\n", status ? "on" : "off");
     msg = "";
 }

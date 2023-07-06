@@ -20,7 +20,7 @@ char sta_ssid[32] = "";
 // 默认连接的WiFi密码
 char sta_password[64] = "";
 // wifi重试次数
-int RETRY_COUNT = 3600;
+int RETRY_COUNT = 360;
 // 用于侦听UDP数据包的本地端口
 int LOCAL_PORT = 8266;
 // 端口
