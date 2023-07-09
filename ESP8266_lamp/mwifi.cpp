@@ -14,7 +14,7 @@ void loadConfig()
 {
 
     uint8_t mac[6];
-    Serial.println(" LoadConfig.......");
+    Serial.println("Load config.......");
     WiFi.macAddress(mac);
     EEPROM.begin(512);
     for (int i = 0; i < sizeof(config); i++)
@@ -139,7 +139,6 @@ void apConfig()
                 Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
                 Udp.write(reply_buffer.c_str());
                 Udp.endPacket();
-                break;
             }
             else if (cmdType == 3)
             {
@@ -156,8 +155,8 @@ void connectWiFi()
     WiFi.mode(WIFI_STA);       // 切换为STA模式
     WiFi.setAutoConnect(true); // 设置自动连接
     WiFi.begin(config.stassid, config.stapsw);
-    Serial.println("Connect WiFi");
-    Serial.printf(PSTR("ssid: %s\n"), config.stassid);
+    Serial.printf(PSTR("start to connect WiFi: %s\n"), config.stassid);
+    digitalWrite(LED_BUILTIN, HIGH); // 状态灯，low亮灯，high熄灭
     int count = 0;
     while (WiFi.status() != WL_CONNECTED)
     {
@@ -189,5 +188,6 @@ void connectWiFi()
     {
         Serial.printf("WiFi Connected!\nIP address: ");
         Serial.println(WiFi.localIP());
+        digitalWrite(LED_BUILTIN, HIGH); // 状态灯，low亮灯，high熄灭
     }
 }

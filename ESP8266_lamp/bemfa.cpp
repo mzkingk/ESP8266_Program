@@ -25,7 +25,7 @@ unsigned long pre_start_tick = 0; // 连接
 bool pre_connected = false;
 
 // 发送数据到TCP服务器
-void send_to_server(String p)
+void sendToServer(String p)
 {
     if (!tcp_client.connected())
     {
@@ -38,7 +38,7 @@ void send_to_server(String p)
 }
 
 // 初始化和服务器建立连接
-void start_tcp_client()
+void startTcpClient()
 {
     if (tcp_client.connect(TCP_SERVER_ADDR, atoi(TCP_SERVER_PORT)))
     {
@@ -47,7 +47,7 @@ void start_tcp_client()
         String su(config.cuid);
         String tcpTemp = "";
         tcpTemp = "cmd=1&uid=" + su + "&topic=" + config.ctopic + "\r\n"; // 构建订阅指令
-        send_to_server(tcpTemp);                                         // 发送订阅指令
+        sendToServer(tcpTemp);                                            // 发送订阅指令
         tcpTemp = "";                                                     // 清空
 
         pre_connected = true;
@@ -65,7 +65,7 @@ void start_tcp_client()
 }
 
 // 检查数据，发送心跳
-void do_client_tick()
+void doClientTick()
 {
     if (WiFi.status() != WL_CONNECTED)
     {
@@ -82,7 +82,7 @@ void do_client_tick()
         }
         else if (millis() - pre_start_tick > 1 * 1000) // 重新连接
         {
-            start_tcp_client();
+            startTcpClient();
         }
         return;
     }
@@ -103,7 +103,7 @@ void do_client_tick()
     if (millis() - pre_heart_tick >= KEEPALIVEATIME)
     {
         pre_heart_tick = millis();
-        send_to_server("cmd=0&msg=keep\r\n");
+        sendToServer("cmd=0&msg=keep\r\n");
     }
     if ((client_buff.length() < 10) || (millis() - client_pre_tick < 500))
     {
@@ -115,18 +115,18 @@ void do_client_tick()
     Serial.print(client_buff);
     if (client_buff.length() > 16)
     {
-        action_handler();
+        actionHandler();
     }
     client_buff = "";
     client_buff_idx = 0;
 }
 
-void action_handler()
+void actionHandler()
 {
     String msg = client_buff.substring(client_buff.indexOf("&msg=") + 5);
     bool status = msg.indexOf("on") >= 0;
-    digitalWrite(LEDPIN, status ? LOW : HIGH);      // 端口
-    digitalWrite(LED_BUILTIN, status ? HIGH : LOW); // 状态灯
+    digitalWrite(LEDPIN, status ? HIGH : LOW);      // 端口
+    digitalWrite(LED_BUILTIN, status ? LOW : HIGH); // 状态灯，low亮灯，high熄灭
     Serial.printf("its %s\n", status ? "on" : "off");
     msg = "";
 }
