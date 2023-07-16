@@ -109,7 +109,7 @@ void apConfig()
             {
                 packetBuffer[len] = 0;
             }
-            Serial.println("Contents:");
+            Serial.println("\nContents:");
             Serial.println(packetBuffer);
             StaticJsonDocument<200> doc;
             DeserializationError error = deserializeJson(doc, packetBuffer);
